@@ -13,9 +13,15 @@ public class ShortUrl : EntityBase
 
     public UrlStatus UrlStatus { get; set; } = UrlStatus.Active;
     public IReadOnlyCollection<UrlClick> Clicks => _clicks.AsReadOnly();
-    
+
     public User User { get; set; } = null!;
     public Guid UserId { get; set; }
 
     private readonly List<UrlClick> _clicks = [];
+
+    public void RegisterClick(string ipAddress, string? referrer = null, string? userAgent = null)
+    {
+        _clicks.Add(UrlClick.Create(this, ipAddress, referrer, userAgent));
+        ClickCount++;
+    }
 }

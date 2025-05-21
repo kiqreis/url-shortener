@@ -22,5 +22,5 @@ public class UrlClick
             Referrer = referrer,
             UserAgent = userAgent
         };
-    }
+    }   
 }
