@@ -2,15 +2,15 @@ namespace UrlShortener.Domain.Entities;
 
 public class UrlClick : EntityBase
 {
-    public DateTime ClickedAt { get; set; }
-    public string IpAddress { get; set; } = string.Empty;
-    public string? Referrer { get; set; }
-    public string? UserAgent { get; set; }
-    public string? CountryCode { get; set; }
-    public string? DeviceType { get; set; }
+    public DateTime ClickedAt { get; private set; }
+    public string IpAddress { get; private set; } = string.Empty;
+    public string? Referrer { get; private set; }
+    public string? UserAgent { get; private set; }
+    public string? CountryCode { get; private set; }
+    public string? DeviceType { get; private set; }
 
-    public ShortUrl? ShortUrl { get; set; }
-    public Guid ShortUrlId { get; set; }
+    public ShortUrl? ShortUrl { get; private set; }
+    public Guid ShortUrlId { get; private set; }
 
     public static UrlClick Create(ShortUrl shortUrl, string ipAddress, string? referrer, string? userAgent)
     {
