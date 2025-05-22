@@ -44,6 +44,7 @@ public class ShortUrl : EntityBase
 
     public void Deactivate()
     {
+        if (!IsActive) return;
         IsActive = false;
         UrlStatus = UrlStatus.Inactive;
     }

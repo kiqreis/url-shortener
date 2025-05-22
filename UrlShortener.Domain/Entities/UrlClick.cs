@@ -1,6 +1,6 @@
 namespace UrlShortener.Domain.Entities;
 
-public class UrlClick
+public class UrlClick : EntityBase
 {
     public DateTime ClickedAt { get; set; }
     public string IpAddress { get; set; } = string.Empty;
@@ -22,5 +22,9 @@ public class UrlClick
             Referrer = referrer,
             UserAgent = userAgent
         };
-    }   
+    }
+
+    public void SetGeoData(string countryCode) => CountryCode = countryCode;
+
+    public void SetDeviceData(string deviceType) => DeviceType = deviceType;
 }
