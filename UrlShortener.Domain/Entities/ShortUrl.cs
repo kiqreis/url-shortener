@@ -4,14 +4,14 @@ namespace UrlShortener.Domain.Entities;
 
 public class ShortUrl : EntityBase
 {
-    public string OriginalUrl { get; private set; } = string.Empty;
-    public string ShortCode { get; private set; } = string.Empty;
-    public DateTime CreatedAt { get; private set; } = DateTime.Now;
+    public string OriginalUrl { get; private set; }
+    public string ShortCode { get; private set; }
+    public DateTime CreatedAt { get; private set; }
     public DateTime? ExpiresAt { get; private set; }
     public int ClickCount { get; private set; }
     public bool IsActive { get; private set; }
 
-    public UrlStatus UrlStatus { get; private set; } = UrlStatus.Active;
+    public UrlStatus UrlStatus { get; private set; }
     public IReadOnlyCollection<UrlClick> Clicks => _clicks.AsReadOnly();
 
     public User User { get; private set; } = null!;
