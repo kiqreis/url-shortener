@@ -6,4 +6,8 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <PackageReference Include="EasyCaching.Redis" Version="1.9.2" />
+    </ItemGroup>
+
 </Project>
