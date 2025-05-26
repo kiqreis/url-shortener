@@ -11,4 +11,9 @@
         <PackageReference Include="Scalar.AspNetCore" Version="2.4.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\UrlShortener.Domain\UrlShortener.Domain.csproj" />
+      <ProjectReference Include="..\UrlShortener.Infrastructure\UrlShortener.Infrastructure.csproj" />
+    </ItemGroup>
+
 </Project>
