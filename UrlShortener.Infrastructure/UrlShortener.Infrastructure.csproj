@@ -10,4 +10,8 @@
       <PackageReference Include="EasyCaching.Redis" Version="1.9.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\UrlShortener.Application\UrlShortener.Application.csproj" />
+    </ItemGroup>
+
 </Project>
