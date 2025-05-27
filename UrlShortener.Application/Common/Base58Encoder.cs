@@ -26,7 +26,7 @@ public class Base58Encoder : IBase58Encoder
             number /= Base;
         }
 
-        return new string(stack.ToArray());
+        return new string([.. stack]);
     }
 
     public long Decode(string encoded)

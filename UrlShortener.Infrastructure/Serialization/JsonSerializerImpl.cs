@@ -5,7 +5,7 @@ namespace UrlShortener.Infrastructure.Serialization;
 
 public class JsonSerializerImpl : IJsonSerializer
 {
-    private readonly JsonSerializerOptions _options = new JsonSerializerOptions
+    private readonly JsonSerializerOptions _options = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         WriteIndented = false
