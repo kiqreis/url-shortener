@@ -1,4 +1,4 @@
-namespace UrlShortener.Application.Services.Cache;
+namespace UrlShortener.Application.Cache.Services;
 
 public interface IRedisCacheService
 {

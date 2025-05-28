@@ -1,6 +1,6 @@
 using StackExchange.Redis;
+using UrlShortener.Application.Cache.Services;
 using UrlShortener.Application.Serialization;
-using UrlShortener.Application.Services.Cache;
 
 namespace UrlShortener.Infrastructure.Cache;
 
