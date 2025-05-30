@@ -36,6 +36,14 @@ public class ShortUrl : EntityBase
         return new ShortUrl(originalUrl, shortCode, userId, expiresAt);
     }
 
+    public void UpdateShortCode(string newShortCode)
+    {
+        if (string.IsNullOrWhiteSpace(newShortCode))
+            throw new ArgumentException("Short code cannot be empty", nameof(newShortCode));
+
+        ShortCode = newShortCode;
+    }
+
     public void RegisterClick(string ipAddress, string? referrer = null, string? userAgent = null)
     {
         _clicks.Add(UrlClick.Create(this, ipAddress, referrer, userAgent));
