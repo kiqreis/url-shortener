@@ -2,7 +2,6 @@
 using UrlShortener.Api.Common.Api;
 using UrlShortener.Application.UrlShortening.DTOs.Requests;
 using UrlShortener.Application.UrlShortening.Services;
-using UrlShortener.Domain.Entities;
 
 namespace UrlShortener.Api.Routes;
 
@@ -14,9 +13,20 @@ public class CreateShortUrl : IEndpoint
         .WithOrder(1)
         .WithOpenApi();
 
-    private static async Task<IResult> HandleAsync([FromBody] ShortenUrlRequest request, [FromServices] IUrlShorteningService handler)
+    private static async Task<IResult> HandleAsync(HttpContext context, [FromBody] ShortenUrlRequest request, [FromServices] IUrlShorteningService handler)
     {
+        var ipAddress = context.Connection.RemoteIpAddress?.ToString();
+
+        if (context.Request.Headers.TryGetValue("X-Forwarded-For", out var forwardedFor))
+        {
+            ipAddress = forwardedFor.FirstOrDefault() ?? ipAddress;
+        }
+
+        request = request with { IpAddress = ipAddress ?? "unknown"};
+
         var result = await handler.ShortenUrlAsync(request);
+
+        Console.WriteLine(ipAddress);
 
         return Results.Created($"/{result.ShortCode}", result);
     }
