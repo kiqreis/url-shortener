@@ -9,4 +9,5 @@ public interface IShortUrlRepository
     Task<bool> AddAsync(ShortUrl shortUrl);
     Task<bool> UpdateAsync(ShortUrl shortUrl);
     Task<bool> ShortCodeExistsAsync(string shortCode);
+    Task<bool> TryAddAsync(ShortUrl url);
 }

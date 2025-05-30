@@ -1,4 +1,5 @@
 using StackExchange.Redis;
+using System.Text.Json;
 using UrlShortener.Application.Serialization;
 using UrlShortener.Domain.Entities;
 using UrlShortener.Domain.Repositories;
@@ -40,8 +41,15 @@ public class ShortUrlRepository(IConnectionMultiplexer redis, IJsonSerializer js
             ? TimeSpan.FromSeconds(Math.Max(0, (shortUrl.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds))
             : (TimeSpan?)null;
 
-        await transaction.StringSetAsync(urlKey, serialized, expiry);
-        await transaction.StringSetAsync(codeKey, shortUrl.Id.ToString(), expiry);
+        var setUrlTask = transaction.StringSetAsync(urlKey, serialized, expiry);
+        var setCodeTask = transaction.StringSetAsync(codeKey, shortUrl.Id.ToString(), expiry);
+
+        var committed = await transaction.ExecuteAsync();
+
+        if (committed)
+        {
+            await Task.WhenAll(setUrlTask, setCodeTask);
+        }
 
         return await transaction.ExecuteAsync();
     }
@@ -58,4 +66,14 @@ public class ShortUrlRepository(IConnectionMultiplexer redis, IJsonSerializer js
 
     public async Task<bool> ShortCodeExistsAsync(string shortCode) =>
         await _redis.KeyExistsAsync($"{CodeKeyPrefix}{shortCode}");
+
+    public async Task<bool> TryAddAsync(ShortUrl url)
+    {
+        return await _redis.StringSetAsync(
+            key: $"url:{url.ShortCode}",
+            value: JsonSerializer.Serialize(url),
+            when: When.NotExists,
+            expiry: url.ExpiresAt.HasValue ? url.ExpiresAt.Value - DateTime.UtcNow : null
+        );
+    }
 }
