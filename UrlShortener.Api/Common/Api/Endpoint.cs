@@ -1,14 +1,23 @@
 ﻿
+using UrlShortener.Api.Routes;
+
 namespace UrlShortener.Api.Common.Api;
 
 public static class Endpoint
 {
-    public static void MapEndpoint(this WebApplication app)
+    public static void MapEndpoints(this WebApplication app)
     {
         var group = app.MapGroup("/v1");
 
         group.MapGroup("/short-urls")
-            .WithTags("ShortUrls");
+            .WithTags("ShortUrls")
+            .MapEndpoint<CreateShortUrl>();
+    }
+
+    private static IEndpointRouteBuilder MapEndpoint<T>(this IEndpointRouteBuilder routeBuilder) where T : IEndpoint
+    {
+        T.Map(routeBuilder);
+        return routeBuilder;
     }
 }
 
