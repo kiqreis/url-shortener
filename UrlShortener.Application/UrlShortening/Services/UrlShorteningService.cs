@@ -13,6 +13,8 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
     private const int MaxGenerationAttempts = 5;
     private const int MinShortCodeLength = 4;
     private const string UrlIdCounterKey = "url-id-counter";
+    private const int MaxUrlsPerIp = 10;
+    private const string IpLimitKeyPrefix = "anon-ip-limit";
 
     private static readonly string BaseUrl =
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development"
@@ -35,6 +37,22 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
     {
         ValidateUrl(request.OriginalUrl);
 
+        var isAnonymous = request.UserId == null || request.UserId == Guid.Empty;
+
+        if (isAnonymous)
+        {
+            if (string.IsNullOrWhiteSpace(request.UserId.ToString()))
+            {
+                var ipKey = $"{IpLimitKeyPrefix}:{request.IpAddress}:{DateTime.UtcNow:yyyyMMdd}";
+                var count = await cacheService.GetAsync<int>(ipKey);
+
+                if (count >= MaxUrlsPerIp)
+                    throw new Exception("Daily limit of briefting achieved for this ip");
+
+                await cacheService.SetAsync(ipKey, count++, TimeSpan.FromDays(1));
+            }
+        }
+
         var shortCode = request.CustomCode != null
             ? await HandleCustomCode(request.CustomCode)
             : await GenerateUniqueShortCodeAsync();
@@ -42,7 +60,7 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
         var shortUrl = ShortUrl.Create(
             request.OriginalUrl,
             shortCode,
-            request.UserId,
+            request.UserId ?? default!,
             request.Duration);
 
         await InsertShortUrlWithRetry(shortUrl);
@@ -122,7 +140,7 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
     private async Task<ShortUrl> GetFromCacheOrRepository(string shortCode)
     {
         var cached = await cacheService.GetAsync<ShortUrl>($"url:{shortCode}");
-        
+
         if (cached != null) return cached;
 
         var dbUrl = await repository.GetByShortCodeAsync(shortCode);
