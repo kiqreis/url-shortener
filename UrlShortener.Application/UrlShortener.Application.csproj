@@ -10,9 +10,4 @@
       <ProjectReference Include="..\UrlShortener.Domain\UrlShortener.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="UrlShortening\DTOs\Responses\" />
-      <Folder Include="UrlShortening\DTOs\Requests\" />
-    </ItemGroup>
-
 </Project>

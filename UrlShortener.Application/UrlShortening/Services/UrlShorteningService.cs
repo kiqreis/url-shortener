@@ -1,6 +1,8 @@
-﻿using UrlShortener.Application.Cache.Services;
+﻿using System.Security.Cryptography;
+using UrlShortener.Application.Cache.Services;
 using UrlShortener.Application.Common;
 using UrlShortener.Application.UrlShortening.DTOs.Requests;
+using UrlShortener.Application.UrlShortening.DTOs.Responses;
 using UrlShortener.Domain.Entities;
 using UrlShortener.Domain.Repositories;
 
@@ -9,12 +11,19 @@ namespace UrlShortener.Application.UrlShortening.Services;
 public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder encoder, IRedisCacheService cacheService) : IUrlShorteningService
 {
     private const int MaxGenerationAttempts = 5;
+    private const int MinShortCodeLength = 4;
+    private const string UrlIdCounterKey = "url-id-counter";
+
+    private static readonly string BaseUrl =
+        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development"
+            ? "https://localhost:5001"
+            : "https://cut.link";
 
     public async Task<ShortUrl> GetAndTrackAsync(TrackUrlRequest request)
     {
         var shortUrl = await GetFromCacheOrRepository(request.ShortCode);
 
-        TrackClick(shortUrl, request.IpAddress, request.Referrer, request.UserAgent);
+        shortUrl.RegisterClick(request.IpAddress, request.Referrer, request.UserAgent);
 
         await repository.UpdateAsync(shortUrl);
         await UpdateCache(shortUrl);
@@ -22,31 +31,57 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
         return shortUrl;
     }
 
-    public async Task<ShortUrl> ShortenUrlAsync(ShortenUrlRequest request)
+    public async Task<ShortenUrlResponse> ShortenUrlAsync(ShortenUrlRequest request)
     {
         ValidateUrl(request.OriginalUrl);
 
-        var shortCode = request.CustomCode ?? await GenerateUniqueShortCodeAsync();
-        var shortUrl = ShortUrl.Create(request.OriginalUrl, shortCode, request.UserId, request.Duration);
+        var shortCode = request.CustomCode != null
+            ? await HandleCustomCode(request.CustomCode)
+            : await GenerateUniqueShortCodeAsync();
 
-        await repository.AddAsync(shortUrl);
+        var shortUrl = ShortUrl.Create(
+            request.OriginalUrl,
+            shortCode,
+            request.UserId,
+            request.Duration);
+
+        await InsertShortUrlWithRetry(shortUrl);
         await cacheService.SetAsync($"url:{shortCode}", shortUrl, request.Duration);
 
-        return shortUrl;
+        return CreateResponse(shortUrl);
     }
+
+    private async Task<string> HandleCustomCode(string customCode)
+    {
+        if (!IsValidCustomCode(customCode))
+            throw new ArgumentException("Custom code contains invalid characters");
+
+        if (await repository.ShortCodeExistsAsync(customCode))
+            throw new ArgumentException("Custom code already exists");
+
+        return customCode;
+    }
+
+    private static bool IsValidCustomCode(string code) =>
+        code.All(c => char.IsLetterOrDigit(c) || c is '-' or '_');
 
     public async Task<string> GenerateUniqueShortCodeAsync()
     {
-        string code;
         var attempts = 0;
+        var random = new Random();
+        string code;
 
         do
         {
-            attempts++;
             var number = await GetUniqueNumber();
             code = encoder.Encode(number);
 
-            if (attempts >= MaxGenerationAttempts)
+            while (code.Length < MinShortCodeLength)
+            {
+                code += encoder.Encode(random.Next(1, 58));
+            }
+
+            if (++attempts >= MaxGenerationAttempts)
             {
                 code = GenerateFallbackCode();
                 break;
@@ -57,28 +92,42 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
         return code;
     }
 
+    private async Task InsertShortUrlWithRetry(ShortUrl shortUrl)
+    {
+        const int maxRetries = 3;
+
+        for (int i = 0; i < maxRetries; i++)
+        {
+            if (await repository.TryAddAsync(shortUrl))
+                return;
+
+            if (i < maxRetries - 1)
+            {
+                shortUrl.UpdateShortCode(await GenerateUniqueShortCodeAsync());
+            }
+        }
+
+        throw new Exception("Failed to create short URL after retries");
+    }
+
     private static void ValidateUrl(string url)
     {
         if (!Uri.IsWellFormedUriString(url, UriKind.Absolute))
-            throw new HttpRequestException("Invalid url format");
+            throw new HttpRequestException("Invalid URL format");
     }
 
-    private static void TrackClick(ShortUrl shortUrl, string ipAddress, string? referrer, string? userAgent)
-    {
-        shortUrl.RegisterClick(ipAddress, referrer, userAgent);
-    }
-
-    private static string GenerateFallbackCode() => Guid.NewGuid().ToString("N")[..8];
+    private static string GenerateFallbackCode() =>
+        Guid.NewGuid().ToString("N")[..8];
 
     private async Task<ShortUrl> GetFromCacheOrRepository(string shortCode)
     {
-        var cachedUrl = await cacheService.GetAsync<ShortUrl>($"url:{shortCode}");
+        var cached = await cacheService.GetAsync<ShortUrl>($"url:{shortCode}");
+        
+        if (cached != null) return cached;
 
-        if (cachedUrl != null) return cachedUrl;
+        var dbUrl = await repository.GetByShortCodeAsync(shortCode);
 
-        var repositoryUrl = await repository.GetByShortCodeAsync(shortCode);
-
-        return repositoryUrl ?? throw new HttpRequestException("Short url not found");
+        return dbUrl ?? throw new HttpRequestException("Short URL not found");
     }
 
     private async Task UpdateCache(ShortUrl shortUrl)
@@ -92,11 +141,26 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
     {
         try
         {
-            return await cacheService.IncrementAsync("url-id-counter");
+            if (!await cacheService.KeyExistsAsync(UrlIdCounterKey))
+                await cacheService.SetAsync(UrlIdCounterKey, 1_000_000L);
+
+            return await cacheService.IncrementAsync(UrlIdCounterKey);
         }
         catch
         {
-            return Math.Abs(Guid.NewGuid().GetHashCode());
+            var bytes = new byte[8];
+            RandomNumberGenerator.Fill(bytes);
+
+            return BitConverter.ToInt64(bytes, 0) & long.MaxValue;
         }
     }
+
+    private static ShortenUrlResponse CreateResponse(ShortUrl shortUrl) =>
+        new(
+            OriginalUrl: shortUrl.OriginalUrl,
+            ShortCode: shortUrl.ShortCode,
+            ShortUrl: $"{BaseUrl}/{shortUrl.ShortCode}",
+            CreatedAt: shortUrl.CreatedAt,
+            ExpiresAt: shortUrl.ExpiresAt
+        );
 }

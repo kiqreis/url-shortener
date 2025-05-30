@@ -11,12 +11,13 @@ public class CreateShortUrl : IEndpoint
     public static void Map(IEndpointRouteBuilder routeBuilder) => routeBuilder.MapPost("/shorten", HandleAsync)
         .WithName("ShortUrls: shorten url")
         .WithDescription("Shorten a url")
-        .WithOrder(1);
+        .WithOrder(1)
+        .WithOpenApi();
 
     private static async Task<IResult> HandleAsync([FromBody] ShortenUrlRequest request, [FromServices] IUrlShorteningService handler)
     {
-        ShortUrl result = await handler.ShortenUrlAsync(request);
-        
-        return Results.Created(string.Empty, result);
+        var result = await handler.ShortenUrlAsync(request);
+
+        return Results.Created($"/{result.ShortCode}", result);
     }
 }
