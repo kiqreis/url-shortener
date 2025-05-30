@@ -16,6 +16,8 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
     private const int MaxUrlsPerIp = 10;
     private const string IpLimitKeyPrefix = "anon-ip-limit";
 
+    private static readonly TimeSpan DefaultDuration = TimeSpan.FromDays(7);
+
     private static readonly string BaseUrl =
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development"
             ? "https://localhost:5001"
@@ -57,11 +59,16 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
             ? await HandleCustomCode(request.CustomCode)
             : await GenerateUniqueShortCodeAsync();
 
+        var duration = request.Duration ?? DefaultDuration;
+
+        if (duration <= TimeSpan.Zero)
+            throw new ArgumentException("Duration must be gretter than zero");
+
         var shortUrl = ShortUrl.Create(
             request.OriginalUrl,
             shortCode,
-            request.UserId ?? default!,
-            request.Duration);
+            request.UserId ?? Guid.Empty,
+            duration);
 
         await InsertShortUrlWithRetry(shortUrl);
         await cacheService.SetAsync($"url:{shortCode}", shortUrl, request.Duration);
@@ -151,6 +158,9 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
     private async Task UpdateCache(ShortUrl shortUrl)
     {
         var remainingTTL = await cacheService.GetTimeToLiveAsync($"url:{shortUrl.ShortCode}");
+
+        if (remainingTTL == TimeSpan.Zero)
+            remainingTTL = DefaultDuration;
 
         await cacheService.SetAsync($"url:{shortUrl.ShortCode}", shortUrl, remainingTTL);
     }

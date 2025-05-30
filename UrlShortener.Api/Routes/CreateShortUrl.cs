@@ -8,7 +8,7 @@ namespace UrlShortener.Api.Routes;
 public class CreateShortUrl : IEndpoint
 {
     public static void Map(IEndpointRouteBuilder routeBuilder) => routeBuilder.MapPost("/shorten", HandleAsync)
-        .WithName("ShortUrls: shorten url")
+        .WithName("ShortUrl: shorten url")
         .WithDescription("Shorten a url")
         .WithOrder(1)
         .WithOpenApi();
