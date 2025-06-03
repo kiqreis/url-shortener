@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Builder;
 using Scalar.AspNetCore;
 using StackExchange.Redis;
 using UrlShortener.Api.Common.Api;
@@ -27,15 +28,27 @@ builder.Services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
 builder.Services.AddSingleton<IBase58Encoder, Base58Encoder>();
 builder.Services.AddScoped<IUrlShorteningService, UrlShorteningService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 var app = builder.Build();
 
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+
     app.MapScalarApiReference(opt =>
     {
-        opt.WithTheme(ScalarTheme.DeepSpace);
+        opt.WithTheme(ScalarTheme.Laserwave);
     });
 }
 

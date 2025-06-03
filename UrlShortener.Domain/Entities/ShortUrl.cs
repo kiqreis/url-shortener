@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using UrlShortener.Domain.Enums;
 
 namespace UrlShortener.Domain.Entities;
@@ -19,6 +20,7 @@ public class ShortUrl : EntityBase
 
     private readonly List<UrlClick> _clicks = [];
 
+    [JsonConstructor]
     private ShortUrl(string originalUrl, string shortCode, Guid userId, DateTime? expiresAt = null)
     {
         OriginalUrl = originalUrl ?? throw new ArgumentNullException(nameof(originalUrl));

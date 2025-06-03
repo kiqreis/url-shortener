@@ -26,8 +26,6 @@ public class CreateShortUrl : IEndpoint
 
         var result = await handler.ShortenUrlAsync(request);
 
-        Console.WriteLine(ipAddress);
-
         return Results.Created($"/{result.ShortCode}", result);
     }
 }

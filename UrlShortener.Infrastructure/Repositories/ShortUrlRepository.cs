@@ -71,7 +71,7 @@ public class ShortUrlRepository(IConnectionMultiplexer redis, IJsonSerializer js
     {
         return await _redis.StringSetAsync(
             key: $"url:{url.ShortCode}",
-            value: JsonSerializer.Serialize(url),
+            value: jsonSerializer.Serialize(url),
             when: When.NotExists,
             expiry: url.ExpiresAt.HasValue ? url.ExpiresAt.Value - DateTime.UtcNow : null
         );

@@ -1,4 +1,5 @@
-﻿using System.Security.Cryptography;
+﻿using System.Globalization;
+using System.Security.Cryptography;
 using UrlShortener.Application.Cache.Services;
 using UrlShortener.Application.Common;
 using UrlShortener.Application.UrlShortening.DTOs.Requests;
@@ -23,16 +24,17 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
             ? "https://localhost:5001"
             : "https://cut.link";
 
-    public async Task<ShortUrl> GetAndTrackAsync(TrackUrlRequest request)
+    public async Task<ShortenUrlResponse> GetAndTrackAsync(TrackUrlRequest request)
     {
-        var shortUrl = await GetFromCacheOrRepository(request.ShortCode);
+        var shortCode = ExtractShortCode(request.ShortCode);
+        var shortUrl = await GetFromCacheOrRepository(shortCode);
 
         shortUrl.RegisterClick(request.IpAddress, request.Referrer, request.UserAgent);
 
         await repository.UpdateAsync(shortUrl);
         await UpdateCache(shortUrl);
 
-        return shortUrl;
+        return CreateResponse(shortUrl);
     }
 
     public async Task<ShortenUrlResponse> ShortenUrlAsync(ShortenUrlRequest request)
@@ -43,15 +45,22 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
 
         if (isAnonymous)
         {
-            if (string.IsNullOrWhiteSpace(request.UserId.ToString()))
+            if (string.IsNullOrWhiteSpace(request.IpAddress))
             {
-                var ipKey = $"{IpLimitKeyPrefix}:{request.IpAddress}:{DateTime.UtcNow:yyyyMMdd}";
-                var count = await cacheService.GetAsync<int>(ipKey);
+                throw new ArgumentException("IP Address is required for anonymous users to apply rate limit.");
+            }
 
-                if (count >= MaxUrlsPerIp)
-                    throw new Exception("Daily limit of briefting achieved for this ip");
+            var ipKey = $"{IpLimitKeyPrefix}:{request.IpAddress}:{DateTime.UtcNow:yyyyMMdd}";
+            var count = await cacheService.GetAsync<int>(ipKey);
 
-                await cacheService.SetAsync(ipKey, count++, TimeSpan.FromDays(1));
+            if (count >= MaxUrlsPerIp)
+                throw new Exception("Daily limit of briefting achieved for this ip");
+
+            var newCount = await cacheService.IncrementAsync(ipKey);
+
+            if (newCount == 1)
+            {
+                await cacheService.SetAsync(ipKey, newCount, TimeSpan.FromDays(1));
             }
         }
 
@@ -62,7 +71,7 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
         var duration = request.Duration ?? DefaultDuration;
 
         if (duration <= TimeSpan.Zero)
-            throw new ArgumentException("Duration must be gretter than zero");
+            throw new ArgumentException("Duration must be greater than zero");
 
         var shortUrl = ShortUrl.Create(
             request.OriginalUrl,
@@ -71,7 +80,7 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
             duration);
 
         await InsertShortUrlWithRetry(shortUrl);
-        await cacheService.SetAsync($"url:{shortCode}", shortUrl, request.Duration);
+        await cacheService.SetAsync($"url:{shortCode}", shortUrl, duration);
 
         return CreateResponse(shortUrl);
     }
@@ -143,6 +152,15 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
 
     private static string GenerateFallbackCode() =>
         Guid.NewGuid().ToString("N")[..8];
+
+    private static string ExtractShortCode(string input)
+    {
+        if (Uri.TryCreate(input, UriKind.Absolute, out var uri))
+            return uri.Segments.Last().Trim('/');
+
+        return input.Trim('/');
+    }
+
 
     private async Task<ShortUrl> GetFromCacheOrRepository(string shortCode)
     {

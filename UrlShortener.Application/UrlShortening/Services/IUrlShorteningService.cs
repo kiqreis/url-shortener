@@ -7,6 +7,6 @@ namespace UrlShortener.Application.UrlShortening.Services;
 public interface IUrlShorteningService
 {
     Task<ShortenUrlResponse> ShortenUrlAsync(ShortenUrlRequest request);
-    Task<ShortUrl> GetAndTrackAsync(TrackUrlRequest request);
+    Task<ShortenUrlResponse> GetAndTrackAsync(TrackUrlRequest request);
     Task<string> GenerateUniqueShortCodeAsync();
 }
