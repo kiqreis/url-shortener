@@ -1,5 +1,4 @@
-﻿using System.Globalization;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using UrlShortener.Application.Cache.Services;
 using UrlShortener.Application.Common;
 using UrlShortener.Application.UrlShortening.DTOs.Requests;
@@ -21,7 +20,7 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
 
     private static readonly string BaseUrl =
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development"
-            ? "https://localhost:5001"
+            ? "https://localhost:7134"
             : "https://cut.link";
 
     public async Task<ShortenUrlResponse> GetAndTrackAsync(TrackUrlRequest request)
@@ -132,7 +131,7 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
 
         for (int i = 0; i < maxRetries; i++)
         {
-            if (await repository.TryAddAsync(shortUrl))
+            if (await repository.AddAsync(shortUrl))
                 return;
 
             if (i < maxRetries - 1)
@@ -205,8 +204,9 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
         new(
             OriginalUrl: shortUrl.OriginalUrl,
             ShortCode: shortUrl.ShortCode,
-            ShortUrl: $"{BaseUrl}/{shortUrl.ShortCode}",
+            ShortUrl: $"{BaseUrl}/v1/short-urls/{shortUrl.ShortCode}",
             CreatedAt: shortUrl.CreatedAt,
             ExpiresAt: shortUrl.ExpiresAt
         );
 }
+    
