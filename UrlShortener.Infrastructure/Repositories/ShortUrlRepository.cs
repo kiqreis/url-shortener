@@ -1,5 +1,4 @@
 using StackExchange.Redis;
-using System.Text.Json;
 using UrlShortener.Application.Serialization;
 using UrlShortener.Domain.Entities;
 using UrlShortener.Domain.Repositories;
@@ -10,70 +9,39 @@ public class ShortUrlRepository(IConnectionMultiplexer redis, IJsonSerializer js
 {
     private readonly IDatabase _redis = redis.GetDatabase();
     private const string UrlKeyPrefix = "url:";
-    private const string CodeKeyPrefix = "code:";
 
-    public async Task<ShortUrl> GetByIdAsync(string id)
+    public async Task<ShortUrl> GetByShortCodeAsync(string shortCode)
     {
-        var json = await _redis.StringGetAsync($"{UrlKeyPrefix}{id}");
+        var json = await _redis.StringGetAsync($"{UrlKeyPrefix}{shortCode}");
 
         return json.HasValue ? jsonSerializer.Deserialize<ShortUrl>(json) : null!;
     }
 
-    public async Task<ShortUrl> GetByShortCodeAsync(string shortCode)
-    {
-        var urlId = await _redis.StringGetAsync($"{CodeKeyPrefix}{shortCode}");
-
-        if (!urlId.HasValue) return null!;
-
-        return await GetByIdAsync(urlId);
-    }
-
     public async Task<bool> AddAsync(ShortUrl shortUrl)
     {
-        var transaction = _redis.CreateTransaction();
-
-        var urlKey = $"{UrlKeyPrefix}{shortUrl.Id}";
-        var codeKey = $"{CodeKeyPrefix}{shortUrl.ShortCode}";
-
+        var urlKey = $"{UrlKeyPrefix}{shortUrl.ShortCode}";
         var serialized = jsonSerializer.Serialize(shortUrl);
 
         var expiry = shortUrl.ExpiresAt.HasValue
             ? TimeSpan.FromSeconds(Math.Max(0, (shortUrl.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds))
             : (TimeSpan?)null;
 
-        var setUrlTask = transaction.StringSetAsync(urlKey, serialized, expiry);
-        var setCodeTask = transaction.StringSetAsync(codeKey, shortUrl.Id.ToString(), expiry);
-
-        var committed = await transaction.ExecuteAsync();
-
-        if (committed)
-        {
-            await Task.WhenAll(setUrlTask, setCodeTask);
-        }
-
-        return await transaction.ExecuteAsync();
+        return await _redis.StringSetAsync(urlKey, serialized, expiry, When.NotExists);
     }
 
     public async Task<bool> UpdateAsync(ShortUrl shortUrl)
     {
-        var remainingTtl = await _redis.KeyTimeToLiveAsync($"{UrlKeyPrefix}{shortUrl.Id}");
+        var urlKey = $"{UrlKeyPrefix}{shortUrl.ShortCode}";
+        var remainingTtl = await _redis.KeyTimeToLiveAsync(urlKey);
 
-        return await _redis.StringSetAsync(
-            $"{UrlKeyPrefix}{shortUrl.Id}",
-            jsonSerializer.Serialize(shortUrl),
-            remainingTtl);
+        if (remainingTtl == TimeSpan.Zero || remainingTtl == null)
+            remainingTtl = shortUrl.ExpiresAt.HasValue
+                ? TimeSpan.FromSeconds(Math.Max(0, (shortUrl.ExpiresAt.Value - DateTime.UtcNow).TotalSeconds))
+                : TimeSpan.FromDays(7);
+
+        return await _redis.StringSetAsync(urlKey, jsonSerializer.Serialize(shortUrl), remainingTtl);
     }
 
     public async Task<bool> ShortCodeExistsAsync(string shortCode) =>
-        await _redis.KeyExistsAsync($"{CodeKeyPrefix}{shortCode}");
-
-    public async Task<bool> TryAddAsync(ShortUrl url)
-    {
-        return await _redis.StringSetAsync(
-            key: $"url:{url.ShortCode}",
-            value: jsonSerializer.Serialize(url),
-            when: When.NotExists,
-            expiry: url.ExpiresAt.HasValue ? url.ExpiresAt.Value - DateTime.UtcNow : null
-        );
-    }
+        await _redis.KeyExistsAsync($"{UrlKeyPrefix}{shortCode}");
 }

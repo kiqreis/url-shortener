@@ -1,6 +1,5 @@
 ﻿using UrlShortener.Application.UrlShortening.DTOs.Requests;
 using UrlShortener.Application.UrlShortening.DTOs.Responses;
-using UrlShortener.Domain.Entities;
 
 namespace UrlShortener.Application.UrlShortening.Services;
 

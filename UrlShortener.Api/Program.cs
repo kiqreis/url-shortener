@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Builder;
 using Scalar.AspNetCore;
 using StackExchange.Redis;
 using UrlShortener.Api.Common.Api;
