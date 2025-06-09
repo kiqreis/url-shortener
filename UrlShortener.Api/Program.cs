@@ -1,4 +1,4 @@
-using Scalar.AspNetCore;
+using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using UrlShortener.Api.Common.Api;
 using UrlShortener.Application.Cache.Services;
@@ -16,6 +16,16 @@ var redisConnection = builder.Configuration.GetConnectionString("Redis");
 var redis = ConnectionMultiplexer.Connect(redisConnection);
 
 builder.Services.AddOpenApi();
+
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Url Shortener",
+        Version = "v1"
+    });
+});
+
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
@@ -44,11 +54,8 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-
-    app.MapScalarApiReference(opt =>
-    {
-        opt.WithTheme(ScalarTheme.Laserwave);
-    });
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
