@@ -8,7 +8,10 @@ using UrlShortener.Domain.Repositories;
 
 namespace UrlShortener.Application.UrlShortening.Services;
 
-public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder encoder, IRedisCacheService cacheService) : IUrlShorteningService
+public class UrlShorteningService(
+    IShortUrlRepository repository,
+    IBase58Encoder encoder,
+    IRedisCacheService cacheService) : IUrlShorteningService
 {
     private const int MaxGenerationAttempts = 5;
     private const int MinShortCodeLength = 4;
@@ -20,7 +23,7 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
 
     private static readonly string BaseUrl =
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development"
-            ? "https://localhost:7134"
+            ? "http://localhost:5181/"
             : "https://cut.link";
 
     public async Task<ShortenUrlResponse> GetAndTrackAsync(TrackUrlRequest request)
@@ -114,12 +117,9 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
                 code += encoder.Encode(random.Next(1, 58));
             }
 
-            if (++attempts >= MaxGenerationAttempts)
-            {
-                code = GenerateFallbackCode();
-                break;
-            }
-
+            if (++attempts < MaxGenerationAttempts) continue;
+            code = GenerateFallbackCode();
+            break;
         } while (await repository.ShortCodeExistsAsync(code));
 
         return code;
@@ -154,23 +154,12 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
 
     private static string ExtractShortCode(string input)
     {
-        if (Uri.TryCreate(input, UriKind.Absolute, out var uri))
-            return uri.Segments.Last().Trim('/');
-
-        return input.Trim('/');
+        return Uri.TryCreate(input, UriKind.Absolute, out var uri) ? uri.Segments.Last().Trim('/') : input.Trim('/');
     }
 
 
-    private async Task<ShortUrl> GetFromCacheOrRepository(string shortCode)
-    {
-        var cached = await cacheService.GetAsync<ShortUrl>($"url:{shortCode}");
-
-        if (cached != null) return cached;
-
-        var dbUrl = await repository.GetByShortCodeAsync(shortCode);
-
-        return dbUrl ?? throw new HttpRequestException("Short URL not found");
-    }
+    private async Task<ShortUrl> GetFromCacheOrRepository(string shortCode) =>
+        await cacheService.GetAsync<ShortUrl>($"url:{shortCode}");
 
     private async Task UpdateCache(ShortUrl shortUrl)
     {
@@ -209,4 +198,3 @@ public class UrlShorteningService(IShortUrlRepository repository, IBase58Encoder
             ExpiresAt: shortUrl.ExpiresAt
         );
 }
-    
