@@ -5,11 +5,11 @@ using UrlShortener.Infrastructure.Identity;
 
 namespace UrlShortener.Infrastructure.Mappings;
 
-public class ApplicationUserMapper : IEntityTypeConfiguration<ApplicationUser>
+public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
-        builder.ToTable("IdentityUser");
+        builder.ToTable("ApplicationUser");
 
         builder.HasKey(x => x.Id);
 
