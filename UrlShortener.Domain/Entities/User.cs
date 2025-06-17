@@ -4,15 +4,15 @@ namespace UrlShortener.Domain.Entities;
 
 public class User : EntityBase
 {
-    public string Email { get; private set; } = string.Empty;
-    public string Password { get; private set; } = string.Empty;
+    public string Email { get; private set; }
+    public string Password { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public bool IsVerified { get; private set; }
     public UserPlan Plan { get; private set; }
     public IReadOnlyCollection<ShortUrl> Urls => _urls.AsReadOnly();
 
     private readonly List<ShortUrl> _urls = [];
-
+    
     private User(string email, string password)
     {
         Email = email ?? throw new ArgumentNullException(nameof(email));

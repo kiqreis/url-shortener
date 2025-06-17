@@ -8,6 +8,8 @@
 
     <ItemGroup>
       <PackageReference Include="EasyCaching.Redis" Version="1.9.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.6" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.6" />
     </ItemGroup>
 
     <ItemGroup>
