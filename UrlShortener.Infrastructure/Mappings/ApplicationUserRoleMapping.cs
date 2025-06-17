@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace UrlShortener.Infrastructure.Mappings;
 
-public class ApplicationUserRole : IEntityTypeConfiguration<IdentityUserRole<Guid>>
+public class ApplicationUserRoleMapping : IEntityTypeConfiguration<IdentityUserRole<Guid>>
 {
     public void Configure(EntityTypeBuilder<IdentityUserRole<Guid>> builder)
     {
