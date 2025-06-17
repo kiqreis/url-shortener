@@ -6,6 +6,19 @@ services:
       - "6379:6379"
     volumes:
       - redis-data:/data
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=MyP@ssword!23
+      - MSSQL_PID=Express
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    restart: unless-stopped
 
 volumes:
   redis-data:
+  sqlserver-data:
