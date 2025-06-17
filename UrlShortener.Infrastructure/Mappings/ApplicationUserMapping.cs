@@ -14,7 +14,8 @@ public class ApplicationUserMapping : IEntityTypeConfiguration<ApplicationUser>
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
-            .UseIdentityColumn();
+            .HasColumnType("uniqueidentifier")
+            .IsRequired();
 
         builder.HasIndex(x => x.NormalizedUserName).IsUnique();
         builder.HasIndex(x => x.NormalizedEmail).IsUnique();
