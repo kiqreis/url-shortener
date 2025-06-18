@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace UrlShortener.Infrastructure.Mappings;
 
-public class ApplicationUserRoleMapping : IEntityTypeConfiguration<IdentityUserRole<Guid>>
+public class ApplicationUserRoleConfiguration : IEntityTypeConfiguration<IdentityUserRole<Guid>>
 {
     public void Configure(EntityTypeBuilder<IdentityUserRole<Guid>> builder)
     {
-        builder.ToTable("ApplicationUserRole");
+        builder.ToTable("ApplicationUserRoles");
 
         builder.HasKey(x => new
         {

@@ -4,18 +4,18 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace UrlShortener.Infrastructure.Mappings;
 
-public class ApplicationUserClaimMapping : IEntityTypeConfiguration<IdentityUserClaim<Guid>>
+public class ApplicationUserClaimConfiguration : IEntityTypeConfiguration<IdentityUserClaim<Guid>>
 {
     public void Configure(EntityTypeBuilder<IdentityUserClaim<Guid>> builder)
     {
-        builder.ToTable("ApplicationUserClaim");
+        builder.ToTable("ApplicationUserClaims");
 
         builder.HasKey(x => x.Id);
 
         builder.Property(x => x.Id)
+            .HasColumnType("uniqueidentifier")
             .HasDefaultValueSql("NEWSEQUENTIALID()")
             .ValueGeneratedOnAdd();
-
 
         builder.Property(x => x.ClaimType)
             .HasMaxLength(255);

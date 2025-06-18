@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace UrlShortener.Infrastructure.Mappings;
 
-public class ApplicationUserTokenMapping : IEntityTypeConfiguration<IdentityUserToken<Guid>>
+public class ApplicationUserTokenConfiguration : IEntityTypeConfiguration<IdentityUserToken<Guid>>
 {
     public void Configure(EntityTypeBuilder<IdentityUserToken<Guid>> builder)
     {
-        builder.ToTable("ApplicationUserToken");
+        builder.ToTable("ApplicationUserTokens");
 
         builder.HasKey(x => new
         {
