@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
@@ -9,6 +10,7 @@ using UrlShortener.Application.UrlShortening.Services;
 using UrlShortener.Domain.Repositories;
 using UrlShortener.Infrastructure.Cache;
 using UrlShortener.Infrastructure.Data;
+using UrlShortener.Infrastructure.Identity;
 using UrlShortener.Infrastructure.Repositories;
 using UrlShortener.Infrastructure.Serialization;
 
@@ -16,11 +18,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
 var redis = ConnectionMultiplexer.Connect(redisConnection);
-
-builder.Services.AddDbContext<AppDbContext>(opt =>
-{
-    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
 
 builder.Services.AddOpenApi();
 
@@ -53,6 +50,20 @@ builder.Services.AddCors(options =>
             .AllowAnyMethod();
     });
 });
+    
+builder.Services.AddAuthentication();
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddDbContext<AppDbContext>(opt =>
+{
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+});
+
+builder.Services.AddIdentityCore<ApplicationUser>()
+    .AddRoles<IdentityRole<Guid>>()
+    .AddEntityFrameworkStores<AppDbContext>()
+    .AddApiEndpoints();
 
 var app = builder.Build();
 
