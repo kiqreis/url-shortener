@@ -12,11 +12,6 @@ public class ApplicationUserClaimConfiguration : IEntityTypeConfiguration<Identi
 
         builder.HasKey(x => x.Id);
 
-        builder.Property(x => x.Id)
-            .HasColumnType("uniqueidentifier")
-            .HasDefaultValueSql("NEWSEQUENTIALID()")
-            .ValueGeneratedOnAdd();
-
         builder.Property(x => x.ClaimType)
             .HasMaxLength(255);
 

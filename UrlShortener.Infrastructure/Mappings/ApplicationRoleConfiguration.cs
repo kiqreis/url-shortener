@@ -1,12 +1,13 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using UrlShortener.Infrastructure.Identity;
 
 namespace UrlShortener.Infrastructure.Mappings;
 
-public class ApplicationRoleConfiguration : IEntityTypeConfiguration<IdentityRole<Guid>>
+public class ApplicationRoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
 {
-    public void Configure(EntityTypeBuilder<IdentityRole<Guid>> builder)
+    public void Configure(EntityTypeBuilder<ApplicationRole> builder)
     {
         builder.ToTable("ApplicationRoles");
 
