@@ -56,7 +56,7 @@ public class UrlShorteningService(
             var count = await cacheService.GetAsync<int>(ipKey);
 
             if (count >= MaxUrlsPerIp)
-                throw new Exception("Daily limit of briefting achieved for this ip");
+                throw new Exception("Daily limit of briefing achieved for this ip");
 
             var newCount = await cacheService.IncrementAsync(ipKey);
 
@@ -129,7 +129,7 @@ public class UrlShorteningService(
     {
         const int maxRetries = 3;
 
-        for (int i = 0; i < maxRetries; i++)
+        for (var i = 0; i < maxRetries; i++)
         {
             if (await repository.AddAsync(shortUrl))
                 return;
