@@ -36,6 +36,10 @@ public class IdentityService(
         await userRepository.AddAsync(user);
         await signInManager.SignInAsync(applicationUser, isPersistent: true);
 
-        return new CreateUserResponse(user.Email, user.Plan);
+        return new CreateUserResponse
+        {
+            Email = user.Email,
+            Plan = user.Plan
+        };
     }
 }

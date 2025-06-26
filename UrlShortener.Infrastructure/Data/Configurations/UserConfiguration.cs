@@ -33,7 +33,5 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<string>()
             .HasColumnType("nvarchar")
             .HasMaxLength(20);
-        
-        throw new NotImplementedException();
     }
 }
