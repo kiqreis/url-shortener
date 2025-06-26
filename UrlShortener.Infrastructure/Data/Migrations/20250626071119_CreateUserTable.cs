@@ -23,6 +23,30 @@ namespace UrlShortener.Infrastructure.Migrations
                 name: "Plan",
                 table: "ApplicationUsers");
 
+            migrationBuilder.RenameIndex(
+                name: "IX_ApplicationUsers_NormalizedUserName",
+                table: "ApplicationUsers",
+                newName: "UserNameIndex");
+
+            migrationBuilder.RenameIndex(
+                name: "IX_ApplicationUsers_NormalizedEmail",
+                table: "ApplicationUsers",
+                newName: "EmailIndex");
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
@@ -88,6 +112,23 @@ namespace UrlShortener.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserRoles_RoleId",
+                table: "ApplicationUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApplicationUserRoleClaims_RoleId",
+                table: "ApplicationUserRoleClaims",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true,
+                filter: "[NormalizedName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ShortUrl_UserId",
                 table: "ShortUrl",
                 column: "UserId");
@@ -102,11 +143,38 @@ namespace UrlShortener.Infrastructure.Migrations
                 table: "Users",
                 column: "Email",
                 unique: true);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ApplicationUserRoleClaims_AspNetRoles_RoleId",
+                table: "ApplicationUserRoleClaims",
+                column: "RoleId",
+                principalTable: "AspNetRoles",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_ApplicationUserRoles_AspNetRoles_RoleId",
+                table: "ApplicationUserRoles",
+                column: "RoleId",
+                principalTable: "AspNetRoles",
+                principalColumn: "Id",
+                onDelete: ReferentialAction.Cascade);
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_ApplicationUserRoleClaims_AspNetRoles_RoleId",
+                table: "ApplicationUserRoleClaims");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_ApplicationUserRoles_AspNetRoles_RoleId",
+                table: "ApplicationUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
+
             migrationBuilder.DropTable(
                 name: "UrlClick");
 
@@ -115,6 +183,24 @@ namespace UrlShortener.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropIndex(
+                name: "IX_ApplicationUserRoles_RoleId",
+                table: "ApplicationUserRoles");
+
+            migrationBuilder.DropIndex(
+                name: "IX_ApplicationUserRoleClaims_RoleId",
+                table: "ApplicationUserRoleClaims");
+
+            migrationBuilder.RenameIndex(
+                name: "UserNameIndex",
+                table: "ApplicationUsers",
+                newName: "IX_ApplicationUsers_NormalizedUserName");
+
+            migrationBuilder.RenameIndex(
+                name: "EmailIndex",
+                table: "ApplicationUsers",
+                newName: "IX_ApplicationUsers_NormalizedEmail");
 
             migrationBuilder.AddColumn<DateTime>(
                 name: "CreatedAt",
