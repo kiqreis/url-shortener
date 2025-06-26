@@ -13,7 +13,8 @@ public class CreateShortUrl : IEndpoint
         .WithOrder(1)
         .WithOpenApi();
 
-    private static async Task<IResult> HandleAsync(HttpContext context, [FromBody] ShortenUrlRequest request, [FromServices] IUrlShorteningService handler)
+    private static async Task<IResult> HandleAsync(HttpContext context, [FromBody] ShortenUrlRequest request,
+        [FromServices] IUrlShorteningService handler)
     {
         var ipAddress = context.Connection.RemoteIpAddress?.ToString();
 
@@ -22,7 +23,7 @@ public class CreateShortUrl : IEndpoint
             ipAddress = forwardedFor.FirstOrDefault() ?? ipAddress;
         }
 
-        request = request with { IpAddress = ipAddress ?? "unknown"};
+        request = request with { IpAddress = ipAddress ?? "unknown" };
 
         var result = await handler.ShortenUrlAsync(request);
 

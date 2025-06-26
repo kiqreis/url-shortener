@@ -15,5 +15,5 @@ public class CreateUserRequest
     [StringLength(60, ErrorMessage = "Password length is too long", MinimumLength = 6)]
     public string Password { get; set; } = string.Empty;
 
-    public static implicit operator User(CreateUserRequest request) => User.Create(request.Email, request.Password);
+    public static implicit operator User(CreateUserRequest request) => new(request.Email);
 }

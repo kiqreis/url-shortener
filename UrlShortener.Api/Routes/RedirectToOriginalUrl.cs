@@ -13,7 +13,8 @@ public class RedirectToOriginalUrl : IEndpoint
         .WithOrder(2)
         .WithOpenApi();
 
-    private static async Task<IResult> HandleAsync(HttpContext context, [FromServices] IUrlShorteningService handler, [FromRoute] string shortCode)
+    private static async Task<IResult> HandleAsync(HttpContext context, [FromServices] IUrlShorteningService handler,
+        [FromRoute] string shortCode)
     {
         var request = new TrackUrlRequest(
             shortCode,

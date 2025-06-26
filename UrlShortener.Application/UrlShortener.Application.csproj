@@ -10,8 +10,4 @@
       <ProjectReference Include="..\UrlShortener.Domain\UrlShortener.Domain.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Users\Services\" />
-    </ItemGroup>
-
 </Project>
