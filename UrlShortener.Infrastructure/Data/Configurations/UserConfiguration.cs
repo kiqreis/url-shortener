@@ -33,5 +33,18 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<string>()
             .HasColumnType("nvarchar")
             .HasMaxLength(20);
+        
+        builder.HasMany(u => u.Urls)
+            .WithOne(url => url.User)
+            .HasForeignKey(url => url.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+    
+        builder.Navigation(u => u.Urls)
+            .UsePropertyAccessMode(PropertyAccessMode.Field)
+            .HasField("_urls");
+    
+        builder.HasIndex(u => u.Email)
+            .IsUnique()
+            .HasDatabaseName("IX_Users_Email");
     }
 }
