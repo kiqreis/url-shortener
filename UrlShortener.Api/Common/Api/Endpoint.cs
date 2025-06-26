@@ -1,5 +1,5 @@
 ﻿
-using UrlShortener.Api.Routes;
+using UrlShortener.Api.Routes.UrlShortening;
 
 namespace UrlShortener.Api.Common.Api;
 

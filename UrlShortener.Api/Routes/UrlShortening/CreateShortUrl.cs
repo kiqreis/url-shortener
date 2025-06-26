@@ -3,7 +3,7 @@ using UrlShortener.Api.Common.Api;
 using UrlShortener.Application.UrlShortening.DTOs.Requests;
 using UrlShortener.Application.UrlShortening.Services;
 
-namespace UrlShortener.Api.Routes;
+namespace UrlShortener.Api.Routes.UrlShortening;
 
 public class CreateShortUrl : IEndpoint
 {
