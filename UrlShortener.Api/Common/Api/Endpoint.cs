@@ -13,6 +13,9 @@ public static class Endpoint
             .WithTags("ShortUrls")
             .MapEndpoint<CreateShortUrl>()
             .MapEndpoint<RedirectToOriginalUrl>();
+
+        group.MapGroup("/users")
+            .WithTags("Users");
     }
 
     private static IEndpointRouteBuilder MapEndpoint<T>(this IEndpointRouteBuilder routeBuilder) where T : IEndpoint
