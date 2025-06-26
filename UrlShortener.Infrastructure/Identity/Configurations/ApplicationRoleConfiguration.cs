@@ -1,8 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using UrlShortener.Infrastructure.Identity;
 
-namespace UrlShortener.Infrastructure.Mappings;
+namespace UrlShortener.Infrastructure.Identity.Mappings;
 
 public class ApplicationRoleConfiguration : IEntityTypeConfiguration<ApplicationRole>
 {

@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace UrlShortener.Infrastructure.Mappings;
+namespace UrlShortener.Infrastructure.Identity.Mappings;
 
 public class ApplicationUserClaimConfiguration : IEntityTypeConfiguration<IdentityUserClaim<Guid>>
 {
