@@ -1,5 +1,6 @@
 ﻿
 using UrlShortener.Api.Routes.UrlShortening;
+using UrlShortener.Api.Routes.User;
 
 namespace UrlShortener.Api.Common.Api;
 
@@ -15,7 +16,8 @@ public static class Endpoint
             .MapEndpoint<RedirectToOriginalUrl>();
 
         group.MapGroup("/users")
-            .WithTags("Users");
+            .WithTags("Users")
+            .MapEndpoint<CreateUser>();
     }
 
     private static IEndpointRouteBuilder MapEndpoint<T>(this IEndpointRouteBuilder routeBuilder) where T : IEndpoint

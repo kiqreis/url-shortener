@@ -10,10 +10,12 @@ using UrlShortener.Application.Cache.Services;
 using UrlShortener.Application.Common;
 using UrlShortener.Application.Serialization;
 using UrlShortener.Application.UrlShortening.Services;
+using UrlShortener.Application.Users.Services;
 using UrlShortener.Domain.Repositories;
 using UrlShortener.Infrastructure.Cache;
 using UrlShortener.Infrastructure.Data;
 using UrlShortener.Infrastructure.Identity;
+using UrlShortener.Infrastructure.Identity.Services;
 using UrlShortener.Infrastructure.Repositories;
 using UrlShortener.Infrastructure.Serialization;
 
@@ -38,8 +40,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 builder.Services.AddSingleton<IJsonSerializer, JsonSerializerImpl>();
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
+builder.Services.AddScoped<IIdentityService, IdentityService>();
 
 builder.Services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
 builder.Services.AddSingleton<IBase58Encoder, Base58Encoder>();
 builder.Services.AddScoped<IUrlShorteningService, UrlShorteningService>();
