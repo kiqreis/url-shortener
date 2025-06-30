@@ -79,7 +79,7 @@ public class JwtService : IJwtService
         };
     }
 
-    public JwtTokenValidation ValidateToken(string token)
+    private JwtTokenValidation ValidateToken(string token)
     {
         try
         {
@@ -129,5 +129,30 @@ public class JwtService : IJwtService
         {
             return JwtTokenValidation.Failure($"Error token validation: {ex.Message}");
         }
+    }
+    
+    public JwtToken? RefreshToken(string token, int? newExpiryMinutes = null)
+    {
+        var validationResult = ValidateToken(token);
+        
+        if (!validationResult.IsValid || string.IsNullOrEmpty(validationResult.Subject))
+            return null;
+
+        var expiry = newExpiryMinutes ?? _jwtConfig.ExpiryInMinutes;
+
+        if (!newExpiryMinutes.HasValue) return GenerateToken(validationResult.Subject, validationResult.Claims);
+        
+        var tempConfig = new JwtConfig
+        {
+            Secret = _jwtConfig.Secret,
+            Issuer = _jwtConfig.Issuer,
+            Audience = _jwtConfig.Audience,
+            ExpiryInMinutes = expiry,
+            Algorithm = _jwtConfig.Algorithm
+        };
+            
+        var tempService = new JwtService(tempConfig);
+            
+        return tempService.GenerateToken(validationResult.Subject, validationResult.Claims);
     }
 }
