@@ -20,9 +20,9 @@ public class JwtTokenValidation
             Claims = claims,
         };
 
-    public static JwtTokenValidation Failure(ClaimsPrincipal principal, string message) => new()
+    public static JwtTokenValidation Failure(string errorMessage) => new()
     {
         IsValid = false,
-        ErrorMessage = message,
+        ErrorMessage = errorMessage,
     };
 }
