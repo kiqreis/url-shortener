@@ -47,7 +47,7 @@ public class JwtService : IJwtService
                 ClaimValueTypes.Integer64)
         };
 
-        if (customClaims?.Count >= 0)
+        if (customClaims?.Count > 0)
             claims.AddRange(customClaims.Select(k => new Claim(k.Key, k.Value)));
 
         var securityKey = GetSymmetricSecurityKey();
@@ -84,6 +84,7 @@ public class JwtService : IJwtService
         try
         {
             var tokenHandler = new JwtSecurityTokenHandler();
+            
             var validationParameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
@@ -133,26 +134,14 @@ public class JwtService : IJwtService
     
     public JwtToken? RefreshToken(string token, int? newExpiryMinutes = null)
     {
+        if (string.IsNullOrWhiteSpace(token))
+            throw new ArgumentException("Token cannot be null or empty", nameof(token));
+        
         var validationResult = ValidateToken(token);
         
         if (!validationResult.IsValid || string.IsNullOrEmpty(validationResult.Subject))
             return null;
 
-        var expiry = newExpiryMinutes ?? _jwtConfig.ExpiryInMinutes;
-
-        if (!newExpiryMinutes.HasValue) return GenerateToken(validationResult.Subject, validationResult.Claims);
-        
-        var tempConfig = new JwtConfig
-        {
-            Secret = _jwtConfig.Secret,
-            Issuer = _jwtConfig.Issuer,
-            Audience = _jwtConfig.Audience,
-            ExpiryInMinutes = expiry,
-            Algorithm = _jwtConfig.Algorithm
-        };
-            
-        var tempService = new JwtService(tempConfig);
-            
-        return tempService.GenerateToken(validationResult.Subject, validationResult.Claims);
+        return GenerateToken(validationResult.Subject, validationResult.Claims);
     }
 }
