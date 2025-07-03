@@ -11,12 +11,14 @@ using UrlShortener.Application.Common;
 using UrlShortener.Application.Serialization;
 using UrlShortener.Application.UrlShortening.Services;
 using UrlShortener.Application.Users.Services;
+using UrlShortener.Domain.Common.Security;
 using UrlShortener.Domain.Repositories;
 using UrlShortener.Infrastructure.Cache;
 using UrlShortener.Infrastructure.Data;
 using UrlShortener.Infrastructure.Identity;
 using UrlShortener.Infrastructure.Identity.Services;
 using UrlShortener.Infrastructure.Repositories;
+using UrlShortener.Infrastructure.Security;
 using UrlShortener.Infrastructure.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -40,6 +42,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 builder.Services.AddSingleton<IJsonSerializer, JsonSerializerImpl>();
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 
 builder.Services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
