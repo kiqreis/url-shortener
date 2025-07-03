@@ -17,7 +17,7 @@ public static class Endpoint
 
         group.MapGroup("/users")
             .WithTags("Users")
-            .MapEndpoint<CreateUser>();
+            .MapEndpoint<RegisterUser>();
     }
 
     private static IEndpointRouteBuilder MapEndpoint<T>(this IEndpointRouteBuilder routeBuilder) where T : IEndpoint

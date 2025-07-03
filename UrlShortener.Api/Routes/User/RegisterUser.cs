@@ -5,9 +5,9 @@ using UrlShortener.Application.Users.Services;
 
 namespace UrlShortener.Api.Routes.User;
 
-public class CreateUser : IEndpoint
+public class RegisterUser : IEndpoint
 {
-    public static void Map(IEndpointRouteBuilder routeBuilder) => routeBuilder.MapPost("/", HandleAsync)
+    public static void Map(IEndpointRouteBuilder routeBuilder) => routeBuilder.MapPost("/register", HandleAsync)
         .WithName("User: create a user")
         .WithDescription("Create a new user")
         .WithOrder(1)
