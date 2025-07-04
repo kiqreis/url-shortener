@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using UrlShortener.Api.Common.Api;
@@ -16,6 +17,7 @@ using UrlShortener.Domain.Repositories;
 using UrlShortener.Infrastructure.Cache;
 using UrlShortener.Infrastructure.Data;
 using UrlShortener.Infrastructure.Identity;
+using UrlShortener.Infrastructure.Identity.Extensions;
 using UrlShortener.Infrastructure.Identity.Services;
 using UrlShortener.Infrastructure.Repositories;
 using UrlShortener.Infrastructure.Security;
@@ -51,6 +53,12 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddSingleton<IBase58Encoder, Base58Encoder>();
 builder.Services.AddScoped<IUrlShorteningService, UrlShorteningService>();
 
+builder.Services.Configure<JwtConfig>(
+    builder.Configuration.GetSection("JwtConfig")
+);
+
+builder.Services.AddSingleton(options => options.GetRequiredService<IOptions<JwtConfig>>().Value);
+
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -70,7 +78,7 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>()
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
     .AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
@@ -81,6 +89,10 @@ builder.Services.Configure<JsonOptions>(options =>
 
 var app = builder.Build();
 
+var config = app.Services.GetRequiredService<IConfiguration>();
+
+if (config.GetValue<bool>("Seed:EnableSeed"))
+    await app.Services.SeedRolesAsync();
 
 if (app.Environment.IsDevelopment())
 {
