@@ -1,12 +1,6 @@
-﻿using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
-using UrlShortener.Application.Users.DTOs.Requests;
+﻿using UrlShortener.Application.Users.DTOs.Requests;
 using UrlShortener.Application.Users.DTOs.Responses;
 using UrlShortener.Application.Users.Services;
-using UrlShortener.Domain.Common.Security;
-using UrlShortener.Domain.Entities;
-using UrlShortener.Domain.Repositories;
-using UrlShortener.Infrastructure.Identity.Constants;
 using UrlShortener.Infrastructure.Identity.Handlers;
 
 namespace UrlShortener.Infrastructure.Identity.Services;
