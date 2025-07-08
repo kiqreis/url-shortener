@@ -6,7 +6,7 @@ namespace UrlShortener.Infrastructure.Identity.Handlers;
 
 public class RegisterUserHandler(IUserRepository userRepository)
 {
-    public async Task<User> CreateUser(ApplicationUser applicationUser, CreateUserRequest request)
+    public async Task<User> CreateUserAsync(ApplicationUser applicationUser, CreateUserRequest request)
     {
         var user = User.Create(applicationUser.Id, request.Email);
         
