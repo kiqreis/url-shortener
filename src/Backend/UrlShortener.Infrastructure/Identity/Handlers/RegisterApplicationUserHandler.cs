@@ -3,14 +3,14 @@ using UrlShortener.Application.Users.DTOs.Requests;
 
 namespace UrlShortener.Infrastructure.Identity.Handlers;
 
-public class RegisterApplicationUserHandler(UserManager<ApplicationUser> userManager, AuthenticationHandler authenticationHandler)
+public class RegisterApplicationUserHandler(UserManager<ApplicationUser> userManager)
 {
     public async Task<ApplicationUser> CreateUserAsync(CreateUserRequest request)
     {
         var applicationUser = new ApplicationUser
         {
             UserName = request.Email,
-            Email = request.Email,
+            Email = request.Email
         };
         
         var result = await userManager.CreateAsync(applicationUser, request.Password);

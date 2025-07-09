@@ -5,7 +5,7 @@ using UrlShortener.Domain.Common.Security;
 
 namespace UrlShortener.Infrastructure.Identity.Handlers;
 
-public class JwtTokenHandler(UserManager<ApplicationUser> userManager, IJwtService jwtService, ILogger logger)
+public class JwtTokenHandler(UserManager<ApplicationUser> userManager, IJwtService jwtService, ILogger<JwtTokenHandler> logger)
 {
     public async Task<string> GenerateJwtTokenAsync(ApplicationUser user, Guid userId)
     {

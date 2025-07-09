@@ -10,7 +10,7 @@ public static class Endpoint
     {
         var group = app.MapGroup("/v1");
 
-        group.MapGroup("/short-urls")
+        group.MapGroup("/urls")
             .WithTags("ShortUrls")
             .MapEndpoint<CreateShortUrl>()
             .MapEndpoint<RedirectToOriginalUrl>();
@@ -26,4 +26,3 @@ public static class Endpoint
         return routeBuilder;
     }
 }
-
