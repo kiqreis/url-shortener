@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 const ScissorsIcon = () => (
   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -39,33 +39,122 @@ const LinkCutIcon1 = () => (
   </svg>
 )
 
-export default function URLShortener() {
-  const [url, setUrl] = useState("")
-  const [shortenedUrls, setShortenedUrls] = useState<
-    Array<{ id: string; original: string; shortened: string; clicks: number }>
-  >([])
-  const [copiedId, setCopiedId] = useState<string | null>(null)
+const BASE_URL = "http://localhost:5181";
 
-  const handleShorten = () => {
-    if (!url) return
+interface ShortenUrlRequest {
+  originalUrl: string;
+  customCode?: string;
+}
 
-    const id = Math.random().toString(36).substring(2, 8)
+interface ShortenUrlResponse {
+  originalUrl: string;
+  shortenedUrl: string;
+  shortCode: string;
+  createdAt: string;
+  clicks: number;
+}
 
-    const newUrl = {
-      id,
-      original: url,
-      shortened: `https://link.cute/${id}`,
-      clicks: Math.floor(Math.random() * 100),
+interface ShortenedUrl {
+  originalUrl: string;
+  shortenedUrl: string;
+  shortCode: string;
+  clicks: number;
+  createdAt: string;
+}
+
+
+class ApiService {
+
+  private static async handleResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+      const error = await response.text();
+
+      throw new Error(`Error: ${response.status} - ${error}`);
     }
 
-    setShortenedUrls((prev) => [newUrl, ...prev])
-    setUrl("")
+    return response.json();
+  }
+
+  static async shortenUrl(request: ShortenUrlRequest): Promise<ShortenUrlResponse> {
+    const response = await fetch(`${BASE_URL}/v1/urls/shorten`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request)
+    });
+
+    return this.handleResponse<ShortenUrlResponse>(response);
+  }
+
+  static async getAllUrls(): Promise<ShortenedUrl[]> {
+    const response = await fetch(`${BASE_URL}/v1/urls`);
+
+    return this.handleResponse<ShortenedUrl[]>(response);
+  }
+
+}
+
+export default function URLShortener() {
+
+  const [url, setUrl] = useState("");
+  const [shortenedUrls, setShortenedUrls] = useState<ShortenedUrl[]>([]);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoadingUrls, setIsLoadingUrls] = useState(true);
+
+  useEffect(() => { loadingExistingUrls(), [] });
+
+  const loadingExistingUrls = async () => {
+    try {
+      setIsLoadingUrls(true);
+
+      const urls = await ApiService.getAllUrls();
+
+      setShortenedUrls(urls);
+    } catch (e) {
+      setError("Error loading existing URLs");
+    } finally {
+      setIsLoadingUrls(false);
+    }
+  }
+
+  const handleShorten = async () => {
+    if (!url.trim()) return
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await ApiService.shortenUrl({ originalUrl: url });
+
+      const newUrl: ShortenedUrl = {
+        originalUrl: response.originalUrl,
+        shortenedUrl: response.shortenedUrl,
+        shortCode: response.shortCode,
+        clicks: 0,
+        createdAt: response.createdAt
+      };
+
+      setShortenedUrls(previous => [newUrl, ...previous]);
+      setUrl("");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Error shortening URL');
+    } finally {
+      setLoading(false);
+    }
   }
 
   const copyToClipboard = async (text: string, id: string) => {
-    await navigator.clipboard.writeText(text)
-    setCopiedId(id)
-    setTimeout(() => setCopiedId(null), 2000)
+    try {
+      await navigator.clipboard.writeText(text);
+
+      setCopiedId(id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (e) {
+      setError("Error copying URL");
+    }
   }
 
   return (
@@ -127,7 +216,7 @@ export default function URLShortener() {
             <h3 className="text-2xl font-bold text-gray-800 mb-6">Your Shortened URLs</h3>
             <div className="space-y-4">
               {shortenedUrls.map((item) => (
-                <div key={item.id} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-md border-0">
+                <div key={item.shortCode} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-md border-0">
                   <div className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-1 min-w-0">
@@ -136,18 +225,18 @@ export default function URLShortener() {
                           <span className="text-sm font-medium text-green-600">Active</span>
                           <span className="text-sm text-gray-500">• {item.clicks} clicks</span>
                         </div>
-                        <p className="text-lg font-semibold text-gray-800 mb-1">{item.shortened}</p>
-                        <p className="text-sm text-gray-600 truncate">{item.original}</p>
+                        <p className="text-lg font-semibold text-gray-800 mb-1">{item.shortenedUrl}</p>
+                        <p className="text-sm text-gray-600 truncate">{item.originalUrl}</p>
                       </div>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => copyToClipboard(item.shortened, item.id)}
+                          onClick={() => copyToClipboard(item.shortenedUrl, item.shortCode)}
                           className="p-2 border border-green-500 text-green-600 hover:bg-green-500 hover:text-white rounded-lg transition-colors"
                         >
-                          {copiedId === item.id ? <CheckIcon /> : <CopyIcon />}
+                          {copiedId === item.shortCode ? <CheckIcon /> : <CopyIcon />}
                         </button>
                         <button
-                          onClick={() => window.open(item.original, "_blank")}
+                          onClick={() => window.open(item.originalUrl, "_blank")}
                           className="p-2 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
                         >
                           <ExternalLinkIcon />
