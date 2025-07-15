@@ -51,6 +51,7 @@ builder.Services.AddScoped<JwtTokenHandler>();
 builder.Services.AddScoped<RegisterApplicationUserHandler>();
 builder.Services.AddScoped<RegisterUserHandler>();
 builder.Services.AddScoped<RoleAssignmentHandler>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IIdentityService, IdentityService>();
 
 builder.Services.AddScoped<IShortUrlRepository, ShortUrlRepository>();
@@ -106,6 +107,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors();
 
 app.UseHttpsRedirection();
 
