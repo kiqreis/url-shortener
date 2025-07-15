@@ -16,6 +16,6 @@ public class GetUserByEmail : IEndpoint
     {
         var result = await handler.GetByEmailAsync(email);
 
-        return Results.Created($"{result!.Email}", result);
+        return Results.Ok(result);
     }
 }
