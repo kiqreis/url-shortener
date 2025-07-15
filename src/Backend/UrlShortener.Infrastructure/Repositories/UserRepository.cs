@@ -1,4 +1,5 @@
-﻿using UrlShortener.Domain.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using UrlShortener.Domain.Entities;
 using UrlShortener.Domain.Repositories;
 using UrlShortener.Infrastructure.Data;
 
@@ -11,4 +12,7 @@ public class UserRepository(AppDbContext context) : IUserRepository
         await context.DomainUsers.AddAsync(user);
         await context.SaveChangesAsync();
     }
+
+    public async Task<User?> GetByEmailAsync(string email) => 
+        await context.DomainUsers.AsNoTracking().FirstOrDefaultAsync(user => user.Email.Equals(email));
 }
