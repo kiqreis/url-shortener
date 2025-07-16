@@ -1,8 +1,8 @@
-﻿using UrlShortener.Domain.Entities;
+﻿using UrlShortener.Application.Users.DTOs.Responses;
 
 namespace UrlShortener.Application.Users.Services;
 
 public interface IUserService
 {
-    Task<User?> GetByEmailAsync(string email); 
+    Task<UserProfileResponse?> GetByEmailAsync(string email); 
 }
