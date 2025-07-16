@@ -220,7 +220,7 @@ public class UrlShorteningService(
         }
     }
 
-    private int GetUserDailyLimit(UserPlan userPlan)
+    private static int GetUserDailyLimit(UserPlan userPlan)
     {
         return userPlan switch
         {
@@ -229,6 +229,45 @@ public class UrlShorteningService(
             UserPlan.Business => int.MaxValue,
             _ => 30
         };
+    }
+
+    private async Task ValidateAndApplyLimitAsync(string? email, string? ipAddress)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            if (string.IsNullOrWhiteSpace(ipAddress))
+                throw new ArgumentException("IP Address is required for anonymous users to apply rate limit.");
+
+            var ipKey = $"{IpLimitKeyPrefix}:{ipAddress}:{DateTime.UtcNow:yyyyMMdd}";
+            var count = await cacheService.GetAsync<int>(ipKey);
+
+            if (count >= MaxUrlsPerIp)
+                throw new Exception("Daily limit of briefing achieved for this io");
+
+            var newCount = await cacheService.IncrementAsync(ipKey);
+
+            if (newCount == 1)
+                await cacheService.SetAsync(ipKey, newCount, TimeSpan.FromDays(1));
+        }
+        else
+        {
+            var user = await userRepository.GetByEmailAsync(email);
+
+            if (user is null)
+                throw new ArgumentException("User not found");
+
+            var userLimit = GetUserDailyLimit(user.Plan);
+            var userCacheKey = $"user_limits:{email}:{DateTime.UtcNow:yyyyMMdd}";
+            var currentCount = await cacheService.GetAsync<int>(userCacheKey);
+
+            if (currentCount >= userLimit)
+                throw new Exception("Daily limit of briefing achieved for this user");
+
+            var newCount = await cacheService.IncrementAsync(userCacheKey);
+
+            if (newCount == 1)
+                await cacheService.SetAsync(userCacheKey, newCount, TimeSpan.FromDays(1));
+        }
     }
 
     private static ShortenUrlResponse CreateResponse(ShortUrl shortUrl) =>
