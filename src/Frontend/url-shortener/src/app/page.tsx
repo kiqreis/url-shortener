@@ -48,17 +48,17 @@ interface ShortenUrlRequest {
 
 interface ShortenUrlResponse {
   originalUrl: string;
-  shortenedUrl: string;
+  shortUrl: string;
   shortCode: string;
   createdAt: string;
-  clicks: number;
+  remainingShortenings: number;
 }
 
 interface ShortenedUrl {
   originalUrl: string;
-  shortenedUrl: string;
+  shortUrl: string;
   shortCode: string;
-  clicks: number;
+  remainingShortenings: number;
   createdAt: string;
 }
 
@@ -131,9 +131,9 @@ export default function URLShortener() {
 
       const newUrl: ShortenedUrl = {
         originalUrl: response.originalUrl,
-        shortenedUrl: response.shortenedUrl,
+        shortUrl: response.shortUrl,
         shortCode: response.shortCode,
-        clicks: 0,
+        remainingShortenings: response.remainingShortenings,
         createdAt: response.createdAt
       };
 
@@ -223,14 +223,14 @@ export default function URLShortener() {
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           <span className="text-sm font-medium text-green-600">Active</span>
-                          <span className="text-sm text-gray-500">• {item.clicks} clicks</span>
+                          <span className="text-sm text-gray-500">• {item.remainingShortenings} remaining shortenings</span> {/*remaining shortenings*/}
                         </div>
-                        <p className="text-lg font-semibold text-gray-800 mb-1">{item.shortenedUrl}</p>
+                        <p className="text-lg font-semibold text-gray-800 mb-1">{item.shortUrl}</p>
                         <p className="text-sm text-gray-600 truncate">{item.originalUrl}</p>
                       </div>
                       <div className="flex gap-2">
                         <button
-                          onClick={() => copyToClipboard(item.shortenedUrl, item.shortCode)}
+                          onClick={() => copyToClipboard(item.shortUrl, item.shortCode)}
                           className="p-2 border border-green-500 text-green-600 hover:bg-green-500 hover:text-white rounded-lg transition-colors"
                         >
                           {copiedId === item.shortCode ? <CheckIcon /> : <CopyIcon />}
