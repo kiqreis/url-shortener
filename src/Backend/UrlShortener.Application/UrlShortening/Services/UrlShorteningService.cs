@@ -16,8 +16,8 @@ public class UrlShorteningService(
     IUserRepository userRepository) : IUrlShorteningService
 {
     private const int MaxGenerationAttempts = 5;
-    private const int MinShortCodeLength = 4;
-    private const string UrlIdCounterKey = "url-id-counter";
+    private const int MinShortCodeLength = 7;
+    private const int RandomBytesLength = 5;
     private const int MaxUrlsPerIp = 10;
     private const string IpLimitKeyPrefix = "anon-ip-limit";
 
@@ -38,35 +38,14 @@ public class UrlShorteningService(
         await repository.UpdateAsync(shortUrl);
         await UpdateCache(shortUrl);
 
-        return CreateResponse(shortUrl);
+        return await CreateResponse(shortUrl);
     }
 
     public async Task<ShortenUrlResponse> ShortenUrlAsync(ShortenUrlRequest request)
     {
         ValidateUrl(request.OriginalUrl);
 
-        var isAnonymous = request.UserId == null || request.UserId == Guid.Empty;
-
-        if (isAnonymous)
-        {
-            if (string.IsNullOrWhiteSpace(request.IpAddress))
-            {
-                throw new ArgumentException("IP Address is required for anonymous users to apply rate limit.");
-            }
-
-            var ipKey = $"{IpLimitKeyPrefix}:{request.IpAddress}:{DateTime.UtcNow:yyyyMMdd}";
-            var count = await cacheService.GetAsync<int>(ipKey);
-
-            if (count >= MaxUrlsPerIp)
-                throw new Exception("Daily limit of briefing achieved for this ip");
-
-            var newCount = await cacheService.IncrementAsync(ipKey);
-
-            if (newCount == 1)
-            {
-                await cacheService.SetAsync(ipKey, newCount, TimeSpan.FromDays(1));
-            }
-        }
+        await ValidateAndApplyLimitAsync(request.UserEmail, request.IpAddress);
 
         var shortCode = request.CustomCode != null
             ? await HandleCustomCode(request.CustomCode)
@@ -77,16 +56,26 @@ public class UrlShorteningService(
         if (duration <= TimeSpan.Zero)
             throw new ArgumentException("Duration must be greater than zero");
 
+        var userId = Guid.Empty;
+
+        if (!string.IsNullOrWhiteSpace(request.UserEmail))
+        {
+            var user = await userRepository.GetByEmailAsync(request.UserEmail);
+
+            if (user is not null)
+                userId = user.Id;
+        }
+
         var shortUrl = ShortUrl.Create(
             request.OriginalUrl,
             shortCode,
-            request.UserId ?? Guid.Empty,
+            userId,
             duration);
 
         await InsertShortUrlWithRetry(shortUrl);
         await cacheService.SetAsync($"url:{shortCode}", shortUrl, duration);
 
-        return CreateResponse(shortUrl);
+        return await CreateResponse(shortUrl, request.UserEmail, request.IpAddress);
     }
 
     private async Task<string> HandleCustomCode(string customCode)
@@ -111,15 +100,35 @@ public class UrlShorteningService(
 
         do
         {
-            var number = await GetUniqueNumber();
-            code = encoder.Encode(number);
+            var bytes = new byte[RandomBytesLength];
+
+            using (var randomNumberGenerator = RandomNumberGenerator.Create())
+            {
+                randomNumberGenerator.GetBytes(bytes);
+            }
+
+            var randomNumber = BitConverter.ToInt64([.. new byte[8].Select((b, i) =>
+                i < bytes.Length ? bytes[i] : (byte)0)], 0) & long.MaxValue;
+
+            code = encoder.Encode(randomNumber);
 
             while (code.Length < MinShortCodeLength)
             {
-                code += encoder.Encode(random.Next(1, 58));
+                var additionalBytes = new byte[1];
+
+                using (var randomNumberGenerator = RandomNumberGenerator.Create())
+                {
+                    randomNumberGenerator.GetBytes(additionalBytes);
+                }
+
+                code += encoder.Encode(additionalBytes[0] % Base58Encoder.Base);
             }
 
+            if (code.Length > MinShortCodeLength + 2)
+                code = code[..(MinShortCodeLength + 2)];
+
             if (++attempts < MaxGenerationAttempts) continue;
+            
             code = GenerateFallbackCode();
             break;
         } while (await repository.ShortCodeExistsAsync(code));
@@ -171,24 +180,6 @@ public class UrlShorteningService(
             remainingTTL = DefaultDuration;
 
         await cacheService.SetAsync($"url:{shortUrl.ShortCode}", shortUrl, remainingTTL);
-    }
-
-    private async Task<long> GetUniqueNumber()
-    {
-        try
-        {
-            if (!await cacheService.KeyExistsAsync(UrlIdCounterKey))
-                await cacheService.SetAsync(UrlIdCounterKey, 1_000_000L);
-
-            return await cacheService.IncrementAsync(UrlIdCounterKey);
-        }
-        catch
-        {
-            var bytes = new byte[8];
-            RandomNumberGenerator.Fill(bytes);
-
-            return BitConverter.ToInt64(bytes, 0) & long.MaxValue;
-        }
     }
 
     private async Task<int> GetRemainingLimitAsync(string email, string? ipAddress)
@@ -251,11 +242,7 @@ public class UrlShorteningService(
         }
         else
         {
-            var user = await userRepository.GetByEmailAsync(email);
-
-            if (user is null)
-                throw new ArgumentException("User not found");
-
+            var user = await userRepository.GetByEmailAsync(email) ?? throw new ArgumentException("User not found");
             var userLimit = GetUserDailyLimit(user.Plan);
             var userCacheKey = $"user_limits:{email}:{DateTime.UtcNow:yyyyMMdd}";
             var currentCount = await cacheService.GetAsync<int>(userCacheKey);
@@ -270,13 +257,17 @@ public class UrlShorteningService(
         }
     }
 
-    private static ShortenUrlResponse CreateResponse(ShortUrl shortUrl) =>
-        new(
+    private async Task<ShortenUrlResponse> CreateResponse(ShortUrl shortUrl, string? email = null, string? ipAddress = null)
+    {
+        var remainingShortenings = await GetRemainingLimitAsync(email!, ipAddress);
+
+        return new(
             OriginalUrl: shortUrl.OriginalUrl,
             ShortCode: shortUrl.ShortCode,
             ShortUrl: $"{BaseUrl}/v1/urls/{shortUrl.ShortCode}",
             CreatedAt: shortUrl.CreatedAt,
-            RemainingShortenings: shortUrl.User.Urls.Count,
+            RemainingShortenings: remainingShortenings,
             ExpiresAt: shortUrl.ExpiresAt
         );
+    }
 }

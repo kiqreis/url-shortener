@@ -3,7 +3,7 @@ namespace UrlShortener.Application.Common;
 public class Base58Encoder : IBase58Encoder
 {
     private const string Alphabet = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-    private static readonly int Base = Alphabet.Length;
+    public static readonly int Base = Alphabet.Length;
 
     private static readonly Dictionary<char, int> MapChar = Alphabet.Select((c, i) => new { Char = c, Index = i })
         .ToDictionary(x => x.Char, x => x.Index);
