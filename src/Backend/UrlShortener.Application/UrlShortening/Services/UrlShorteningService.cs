@@ -4,6 +4,7 @@ using UrlShortener.Application.Common;
 using UrlShortener.Application.UrlShortening.DTOs.Requests;
 using UrlShortener.Application.UrlShortening.DTOs.Responses;
 using UrlShortener.Domain.Entities;
+using UrlShortener.Domain.Enums;
 using UrlShortener.Domain.Repositories;
 
 namespace UrlShortener.Application.UrlShortening.Services;
@@ -11,7 +12,8 @@ namespace UrlShortener.Application.UrlShortening.Services;
 public class UrlShorteningService(
     IShortUrlRepository repository,
     IBase58Encoder encoder,
-    IRedisCacheService cacheService) : IUrlShorteningService
+    IRedisCacheService cacheService,
+    IUserRepository userRepository) : IUrlShorteningService
 {
     private const int MaxGenerationAttempts = 5;
     private const int MinShortCodeLength = 4;
@@ -23,8 +25,8 @@ public class UrlShorteningService(
 
     private static readonly string BaseUrl =
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development"
-            ? "http://localhost:5181/"
-            : "https://cut.link";
+            ? "http://localhost:5181"
+            : "https://cute.link";
 
     public async Task<ShortenUrlResponse> GetAndTrackAsync(TrackUrlRequest request)
     {
@@ -189,12 +191,53 @@ public class UrlShorteningService(
         }
     }
 
+    private async Task<int> GetRemainingLimitAsync(string email, string? ipAddress)
+    {
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            if (string.IsNullOrWhiteSpace(ipAddress))
+                return MaxUrlsPerIp;
+
+            var ipKey = $"{IpLimitKeyPrefix}:{ipAddress}:{DateTime.UtcNow:yyyyMMdd}";
+            var currentCount = await cacheService.GetAsync<int>(ipKey);
+
+            var remaining = MaxUrlsPerIp - currentCount;
+            return remaining < 0 ? 0 : remaining;
+        }
+        else
+        {
+            var user = await userRepository.GetByEmailAsync(email);
+            if (user == null)
+                return 0;
+
+            var userLimit = GetUserDailyLimit(user.Plan);
+            var userCacheKey = $"user_limits:{email}:{DateTime.UtcNow:yyyyMMdd}";
+
+            var currentCount = await cacheService.GetAsync<int>(userCacheKey);
+
+            var remaining = userLimit - currentCount;
+            return remaining < 0 ? 0 : remaining;
+        }
+    }
+
+    private int GetUserDailyLimit(UserPlan userPlan)
+    {
+        return userPlan switch
+        {
+            UserPlan.Free => 30,
+            UserPlan.Pro => 1_000,
+            UserPlan.Business => int.MaxValue,
+            _ => 30
+        };
+    }
+
     private static ShortenUrlResponse CreateResponse(ShortUrl shortUrl) =>
         new(
             OriginalUrl: shortUrl.OriginalUrl,
             ShortCode: shortUrl.ShortCode,
-            ShortUrl: $"{BaseUrl}/v1/short-urls/{shortUrl.ShortCode}",
+            ShortUrl: $"{BaseUrl}/v1/urls/{shortUrl.ShortCode}",
             CreatedAt: shortUrl.CreatedAt,
+            RemainingShortenings: shortUrl.User.Urls.Count,
             ExpiresAt: shortUrl.ExpiresAt
         );
 }
