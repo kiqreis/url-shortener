@@ -252,9 +252,12 @@ export default function URLShortener() {
           <div className="p-6">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-200 
+                <div
+                  className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-200 
                   ${darkMode ? 'text-gray-200' : 'text-gray-400'
-                  }`}>
+                    }`
+                  }
+                >
                   <LinkIcon />
                 </div>
                 <input
@@ -333,38 +336,44 @@ export default function URLShortener() {
         )}
 
         <div className="max-w-4xl mx-auto mt-20">
-          <h3 className="text-2xl font-bold text-gray-800 text-center mb-12">Why use LinkCute?</h3>
+          <h3 className={`text-2xl font-bold mb-12 text-center ${darkMode ? 'text-white' : 'text-gray-800'}`}>Why use LinkCute?</h3>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center mx-auto mb-4 text-red-400">
                 <ScissorsIcon />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Fast and Simple</h4>
-              <p className="text-gray-600 text-sm">Shorten URLs in seconds with our intuitive interface</p>
+              <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Fast and Simple</h4>
+              <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Shorten URLs in seconds with our intuitive interface</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4 text-green-600">
                 <LinkIcon />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Trusted Links</h4>
-              <p className="text-gray-600 text-sm">Secure and stable URLs to share with confidence</p>
+              <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Trusted Links</h4>
+              <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Secure and stable URLs to share with confidence</p>
             </div>
             <div className="text-center">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4 text-blue-600">
                 <ExternalLinkIcon />
               </div>
-              <h4 className="font-semibold text-gray-800 mb-2">Track Clicks</h4>
-              <p className="text-gray-600 text-sm">Monitor the performance of your links in real time</p>
+              <h4 className={`font-semibold mb-2 ${darkMode ? 'text-white' : 'text-gray-800'}`}>Track Clicks</h4>
+              <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>Monitor the performance of your links in real time</p>
             </div>
           </div>
         </div>
       </main>
 
-      <footer className="border-t border-gray-100 bg-white/50 backdrop-blur-sm mt-20">
+      <footer
+        className={`border-t backdrop-blur-sm transition-colors duration-200 ${darkMode
+          ? 'border-gray-700 bg-gray-800/50'
+          : 'border-gray-100 bg-white/50'
+          }`
+        }
+      >
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <p className="text-gray-600 text-sm">© 2025 LinkCute. All rights reserved.</p>
-            <p className="text-gray-500 text-xs mt-2">Simple, fast and reliable URL shortener</p>
+            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'}`}>© 2025 LinkCute. All rights reserved.</p>
+            <p className={`text-xs mt-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>Simple, fast and reliable URL shortener</p>
           </div>
         </div>
       </footer>
