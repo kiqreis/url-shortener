@@ -115,8 +115,11 @@ export default function URLShortener() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingUrls, setIsLoadingUrls] = useState(true);
+  const [darkMode, setDarkMode] = useState(true);
 
-  useEffect(() => { loadingExistingUrls(), [] });
+  useEffect(() => {
+    loadingExistingUrls();
+  }, []);
 
   const loadingExistingUrls = async () => {
     try {
@@ -167,6 +170,10 @@ export default function URLShortener() {
     } catch (e) {
       setError("Error copying URL");
     }
+  }
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
   }
 
   return (
