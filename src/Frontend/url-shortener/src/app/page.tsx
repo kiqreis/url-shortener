@@ -266,7 +266,7 @@ export default function URLShortener() {
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
                   className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:border-transparent transition-colors duration-200 ${darkMode
-                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:ring-blue-400'
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400 focus:ring-blue-500'
                     : 'border-gray-200 bg-white text-gray-800 placeholder-gray-500 focus:ring-red-400'
                     }`}
                 />
@@ -280,7 +280,7 @@ export default function URLShortener() {
                       ? 'bg-gray-700 text-gray-200'
                       : 'bg-gray-200 text-gray-500'
                     } cursor-not-allowed`
-                    : 'bg-red-400 hover:bg-red-500 text-white'
+                    : `${darkMode ? 'bg-blue-500 hover:bg-blue-600 text-white' : 'bg-red-400 hover:bg-red-500 text-white'}`
                   }`}
               >
                 {loading ? 'Shortening...' : 'Shorten'}
