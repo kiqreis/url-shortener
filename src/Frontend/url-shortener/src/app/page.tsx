@@ -32,12 +32,18 @@ const ExternalLinkIcon = () => (
   </svg>
 )
 
-const LinkCutIcon1 = () => (
+const LinkCuteIcon = () => (
   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 5v14m0-14h4m-4 14h5" />
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M14 5v7h3m0 0l-3 7m3-7l3-3" />
   </svg>
 )
+
+const SunIcon = () => {
+  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+}
 
 const BASE_URL = "http://localhost:5181";
 
@@ -163,7 +169,7 @@ export default function URLShortener() {
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-red-100 rounded-lg text-red-400">
-              <LinkCutIcon1 />
+              <LinkCuteIcon />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-800">LinkCute</h1>
