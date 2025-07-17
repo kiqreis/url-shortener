@@ -177,19 +177,26 @@ export default function URLShortener() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${darkMode ? 'dark bg-gray-900' : 'bg-slate-50'}`}>
-      <header className={`border-b backdrop-blur-sm transition-colors duration-200 ${darkMode
-        ? 'border-gray-700 bg-gray-800/50'
-        : 'border-gray-100 bg-white/50'
-        }`}>
+    <div className=
+      {`min-h-screen transition-colors duration-200 ${darkMode ? 'dark bg-gray-900' : 'bg-slate-50'}`}
+    >
+      <header className=
+        {`border-b backdrop-blur-sm transition-colors duration-200 ${darkMode
+          ? 'border-gray-700 bg-gray-800/50'
+          : 'border-gray-100 bg-white/50'
+          }`
+        }
+      >
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`p-2 rounded-lg transition-colors
+              <div
+                className={`p-2 rounded-lg transition-colors
                 ${darkMode
-                  ? 'bg-blue-950 text-blue-400'
-                  : 'bg-red-100 text-red-400'
-                }`}>
+                    ? 'bg-blue-100 text-blue-600'
+                    : 'bg-red-100 text-red-400'
+                  }`}
+              >
                 <LinkCuteIcon />
               </div>
               <div>
