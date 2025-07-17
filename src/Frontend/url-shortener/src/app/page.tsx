@@ -39,11 +39,11 @@ const LinkCuteIcon = () => (
   </svg>
 )
 
-const SunIcon = () => {
+const SunIcon = () => (
   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
   </svg>
-}
+)
 
 const MoonIcon = () => (
   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -177,38 +177,77 @@ export default function URLShortener() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <header className="border-b border-gray-100 bg-white/50 backdrop-blur-sm">
+    <div className={`min-h-screen transition-colors duration-200 ${darkMode ? 'dark bg-gray-900' : 'bg-slate-50'}`}>
+      <header className={`border-b backdrop-blur-sm transition-colors duration-200 ${darkMode
+        ? 'border-gray-700 bg-gray-800/50'
+        : 'border-gray-100 bg-white/50'
+        }`}>
         <div className="container mx-auto px-4 py-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-100 rounded-lg text-red-400">
-              <LinkCuteIcon />
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg transition-colors
+                ${darkMode
+                  ? 'bg-blue-950 text-blue-400'
+                  : 'bg-red-100 text-red-400'
+                }`}>
+                <LinkCuteIcon />
+              </div>
+              <div>
+                <h1 className={`text-2xl font-bold transition-colors duration-200 ${darkMode ? 'text-white' : 'text-gray-800'
+                  }`}>
+                  LinkCute
+                </h1>
+                <p className={`text-sm transition-colors duration-200 ${darkMode ? 'text-gray-200' : 'text-gray-600'
+                  }`}>
+                  Simple and fast URLs button
+                </p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">LinkCute</h1>
-              <p className="text-sm text-gray-600">Simple and fast URLs button</p>
-            </div>
+
+            <button
+              onClick={toggleDarkMode}
+              className={`p-2 rounded-lg transition-colors duration-200 ${darkMode
+                ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400'
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                }`}
+            >
+              {darkMode ? <SunIcon /> : <MoonIcon />}
+            </button>
           </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-12">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Short your URLs in seconds</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h2 className={`text-4xl font-bold mb-4 transition-colors duration-200 ${darkMode ? 'text-white' : 'text-gray-800'
+            }`}>
+            Short your URLs in seconds
+          </h2>
+          <p className={`text-lg max-w-2xl mx-auto transition-colors duration-200 ${darkMode ? 'text-gray-200' : 'text-gray-600'
+            }`}>
             Turn long links into short, easy-to-share URLs. Track clicks and manage your links easily.
           </p>
         </div>
 
-        <div className="max-w-2xl mx-auto mb-12 bg-white/80 backdrop-blur-sm rounded-lg shadow-lg border-0">
-          <div className="p-6 text-center border-b border-gray-100">
-            <h3 className="text-2xl font-semibold text-gray-800 mb-2">Shorten URL</h3>
-            <p className="text-gray-600">Paste your long URL below and get a short link instantly</p>
+        <div className={`max-w-2xl mx-auto mb-12 backdrop-blur-sm rounded-lg shadow-lg border-0 transition-colors duration-200 ${darkMode ? 'bg-gray-800/80' : 'bg-white/80'
+          }`}>
+          <div className={`p-6 text-center border-b transition-colors duration-200 ${darkMode ? 'border-gray-700' : 'border-gray-100'
+            }`}>
+            <h3 className={`text-2xl font-semibold mb-2 transition-colors duration-200 ${darkMode ? 'text-white' : 'text-gray-800'
+              }`}>
+              Shorten URL
+            </h3>
+            <p className={`transition-colors duration-200 ${darkMode ? 'text-gray-200' : 'text-gray-600'
+              }`}>
+              Paste your long URL below and get a short link instantly
+            </p>
           </div>
           <div className="p-6">
             <div className="flex gap-2">
               <div className="relative flex-1">
-                <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                <div className={`absolute left-3 top-1/2 transform -translate-y-1/2 transition-colors duration-200 
+                  ${darkMode ? 'text-gray-200' : 'text-gray-400'
+                  }`}>
                   <LinkIcon />
                 </div>
                 <input
@@ -216,15 +255,25 @@ export default function URLShortener() {
                   placeholder="https://example.com/your-url-is-too-long"
                   value={url}
                   onChange={(e) => setUrl(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent text-gray-800 placeholder-gray-500"
+                  className={`w-full pl-10 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-red-400 focus:border-transparent transition-colors duration-200 ${darkMode
+                    ? 'border-gray-600 bg-gray-700 text-white placeholder-gray-400'
+                    : 'border-gray-200 bg-white text-gray-800 placeholder-gray-500'
+                    }`}
                 />
               </div>
               <button
                 onClick={handleShorten}
-                disabled={!url}
-                className="px-8 py-3 bg-red-400 hover:bg-red-500 disabled:bg-gray-300 disabled:cursor-not-allowed disabled:text-gray-600 text-white font-medium rounded-lg transition-colors"
+                disabled={!url || loading}
+                className={`px-8 py-3 font-medium rounded-lg transition-colors duration-200
+                ${!url || loading
+                    ? `${darkMode
+                      ? 'bg-gray-700 text-gray-200'
+                      : 'bg-gray-200 text-gray-500'
+                    } cursor-not-allowed`
+                    : 'bg-red-400 hover:bg-red-500 text-white'
+                  }`}
               >
-                Shorten
+                {loading ? 'Shortening...' : 'Shorten'}
               </button>
             </div>
           </div>
@@ -232,20 +281,24 @@ export default function URLShortener() {
 
         {shortenedUrls.length > 0 && (
           <div className="max-w-4xl mx-auto">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6">Your Shortened URLs</h3>
+            <h3 className={`text-2xl font-bold mb-6 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>Your Shortened URLs</h3>
             <div className="space-y-4">
               {shortenedUrls.map((item) => (
-                <div key={item.shortCode} className="bg-white/80 backdrop-blur-sm rounded-lg shadow-md border-0">
+                <div
+                  key={item.shortCode}
+                  className={`backdrop-blur-sm rounded-lg shadow-md border-0 transition-colors ${darkMode ? 'bg-gray-800/70' : 'bg-white/80'
+                    }`}
+                >
                   <div className="p-6">
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-2">
                           <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                           <span className="text-sm font-medium text-green-600">Active</span>
-                          <span className="text-sm text-gray-500">• {item.remainingShortenings} remaining shortenings</span> {/*remaining shortenings*/}
+                          <span className={`text-sm ${darkMode ? 'text-gray-200' : 'text-gray-500'}`}>• {item.remainingShortenings} remaining shortenings</span>
                         </div>
-                        <p className="text-lg font-semibold text-gray-800 mb-1">{item.shortUrl}</p>
-                        <p className="text-sm text-gray-600 truncate">{item.originalUrl}</p>
+                        <p className={`text-lg font-semibold mb-1 ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>{item.shortUrl}</p>
+                        <p className={`text-sm truncate ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>{item.originalUrl}</p>
                       </div>
                       <div className="flex gap-2">
                         <button
@@ -256,7 +309,10 @@ export default function URLShortener() {
                         </button>
                         <button
                           onClick={() => window.open(item.originalUrl, "_blank")}
-                          className="p-2 border border-gray-300 text-gray-600 hover:bg-gray-50 rounded-lg transition-colors"
+                          className={`p-2 border rounded-lg transition-colors ${darkMode
+                            ? 'border-gray-400 text-gray-200 hover:bg-gray-200 hover:text-gray-900'
+                            : 'border-gray-400 text-gray-600 hover:bg-gray-600 hover:text-white'
+                            }`}
                         >
                           <ExternalLinkIcon />
                         </button>
