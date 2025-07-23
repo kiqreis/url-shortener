@@ -17,4 +17,6 @@ public class LoginHandler(UserManager<ApplicationUser> userManager, SignInManage
 
     public async Task SignInUserAsync(ApplicationUser user, bool rememberMe = false) =>
         await signInManager.SignInAsync(user, isPersistent: rememberMe);
+    
+    public async Task SignOutUserAsync() => await signInManager.SignOutAsync();
 }
