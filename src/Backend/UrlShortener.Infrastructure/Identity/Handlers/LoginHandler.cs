@@ -9,9 +9,12 @@ public class LoginHandler(UserManager<ApplicationUser> userManager, SignInManage
         var user = await userManager.FindByEmailAsync(email);
 
         if (user is null) return null;
-        
+
         var result = await signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
-        
+
         return result.Succeeded ? user : null;
     }
+
+    public async Task SignInUserAsync(ApplicationUser user, bool rememberMe = false) =>
+        await signInManager.SignInAsync(user, isPersistent: rememberMe);
 }
