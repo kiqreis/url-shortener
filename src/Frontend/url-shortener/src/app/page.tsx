@@ -51,6 +51,11 @@ const MoonIcon = () => (
   </svg>
 )
 
+const UserCircleIcon = () => (
+  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>)
+
 const BASE_URL = "http://localhost:5181";
 
 interface ShortenUrlRequest {
@@ -121,6 +126,64 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
   const handleModalContentClick = (e: FormEvent) => {
     e.stopPropagation();
   }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        onClick={handleModalContentClick}
+        className={`rounded-lg shadow-2xl border-0 transition-colors duration-200 w-full max-w-md mx-4 ${darkMode ? 'bg-gray-800 text-white' : 'bg-white text-gray-800'
+          }`}
+      >
+        <div className="p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-2xl font-bold">{isLogin ? 'Login' : 'Cadastro'}</h2>
+            <button onClick={onClose} className={`p-1 rounded-full transition-colors ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-200'}`}>&times;</button>
+          </div>
+
+          <div className="flex border-b mb-6">
+            <button
+              onClick={() => setIsLogin(true)}
+              className={`py-2 px-4 font-semibold w-1/2 ${isLogin ? (darkMode ? 'border-b-2 border-blue-500 text-blue-500' : 'border-b-2 border-red-400 text-red-400') : (darkMode ? 'text-gray-400' : 'text-gray-500')}`}
+            >
+              Entrar
+            </button>
+            <button
+              onClick={() => setIsLogin(false)}
+              className={`py-2 px-4 font-semibold w-1/2 ${!isLogin ? (darkMode ? 'border-b-2 border-blue-500 text-blue-500' : 'border-b-2 border-red-400 text-red-400') : (darkMode ? 'text-gray-400' : 'text-gray-500')}`}
+            >
+              Criar Conta
+            </button>
+          </div>
+
+          <form>
+            {!isLogin && (
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1">Nome</label>
+                <input type="text" placeholder="Seu nome completo" className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-700 border-gray-600 focus:ring-blue-500' : 'bg-gray-50 border-gray-300 focus:ring-red-400'}`} />
+              </div>
+            )}
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-1">Email</label>
+              <input type="email" placeholder="voce@exemplo.com" className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-700 border-gray-600 focus:ring-blue-500' : 'bg-gray-50 border-gray-300 focus:ring-red-400'}`} />
+            </div>
+
+            <div className="mb-6">
+              <label className="block text-sm font-medium mb-1">Senha</label>
+              <input type="password" placeholder="••••••••" className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-700 border-gray-600 focus:ring-blue-500' : 'bg-gray-50 border-gray-300 focus:ring-red-400'}`} />
+            </div>
+
+            <button type="submit" className={`w-full py-3 font-semibold rounded-lg text-white transition-colors ${darkMode ? 'bg-blue-500 hover:bg-blue-600' : 'bg-red-400 hover:bg-red-500'}`}>
+              {isLogin ? 'Entrar' : 'Criar Conta'}
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function URLShortener() {
@@ -228,15 +291,25 @@ export default function URLShortener() {
               </div>
             </div>
 
-            <button
-              onClick={toggleDarkMode}
-              className={`p-2 rounded-lg transition-colors duration-200 ${darkMode
-                ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400'
-                : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
-                }`}
-            >
-              {darkMode ? <SunIcon /> : <MoonIcon />}
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                title="Login / Cadastro"
+                className={`p-2 rounded-lg transition-colors duration-200 ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
+              >
+                <UserCircleIcon />
+              </button>
+
+              <button
+                onClick={toggleDarkMode}
+                className={`p-2 rounded-lg transition-colors duration-200 ${darkMode
+                  ? 'bg-gray-700 hover:bg-gray-600 text-yellow-400'
+                  : 'bg-gray-100 hover:bg-gray-200 text-gray-600'
+                  }`}
+              >
+                {darkMode ? <SunIcon /> : <MoonIcon />}
+              </button>
+            </div>
           </div>
         </div>
       </header>
