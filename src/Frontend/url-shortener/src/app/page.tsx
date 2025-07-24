@@ -154,30 +154,30 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
               onClick={() => setIsLogin(false)}
               className={`py-2 px-4 font-semibold w-1/2 ${!isLogin ? (darkMode ? 'border-b-2 border-blue-500 text-blue-500' : 'border-b-2 border-red-400 text-red-400') : (darkMode ? 'text-gray-400' : 'text-gray-500')}`}
             >
-              Criar Conta
+              Create Account
             </button>
           </div>
 
           <form>
             {!isLogin && (
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-1">Nome</label>
-                <input type="text" placeholder="Seu nome completo" className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-700 border-gray-600 focus:ring-blue-500' : 'bg-gray-50 border-gray-300 focus:ring-red-400'}`} />
+                <label className="block text-sm font-medium mb-1">Name</label>
+                <input type="text" placeholder="Full name" className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-700 border-gray-600 focus:ring-blue-500' : 'bg-gray-50 border-gray-300 focus:ring-red-400'}`} />
               </div>
             )}
 
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1">Email</label>
-              <input type="email" placeholder="voce@exemplo.com" className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-700 border-gray-600 focus:ring-blue-500' : 'bg-gray-50 border-gray-300 focus:ring-red-400'}`} />
+              <input type="email" placeholder="you@example.com" className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-700 border-gray-600 focus:ring-blue-500' : 'bg-gray-50 border-gray-300 focus:ring-red-400'}`} />
             </div>
 
             <div className="mb-6">
-              <label className="block text-sm font-medium mb-1">Senha</label>
+              <label className="block text-sm font-medium mb-1">Password</label>
               <input type="password" placeholder="••••••••" className={`w-full p-3 border rounded-lg focus:outline-none focus:ring-2 ${darkMode ? 'bg-gray-700 border-gray-600 focus:ring-blue-500' : 'bg-gray-50 border-gray-300 focus:ring-red-400'}`} />
             </div>
 
             <button type="submit" className={`w-full py-3 font-semibold rounded-lg text-white transition-colors ${darkMode ? 'bg-blue-500 hover:bg-blue-600' : 'bg-red-400 hover:bg-red-500'}`}>
-              {isLogin ? 'Entrar' : 'Criar Conta'}
+              {isLogin ? 'Enter' : 'Create Account'}
             </button>
           </form>
         </div>
@@ -294,7 +294,7 @@ export default function URLShortener() {
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsModalOpen(true)}
-                title="Login / Cadastro"
+                title="Login / Register"
                 className={`p-2 rounded-lg transition-colors duration-200 ${darkMode ? 'bg-gray-700 hover:bg-gray-600 text-gray-200' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
               >
                 <UserCircleIcon />
