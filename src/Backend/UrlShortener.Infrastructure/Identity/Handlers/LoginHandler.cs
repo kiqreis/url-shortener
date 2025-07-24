@@ -1,18 +1,19 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using UrlShortener.Application.Users.DTOs.Requests;
 
 namespace UrlShortener.Infrastructure.Identity.Handlers;
 
 public class LoginHandler(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
 {
-    public async Task<ApplicationUser?> ValidateCredentialsAsync(string email, string password)
+    public async Task<ApplicationUser?> ValidateCredentialsAsync(LoginRequest request)
     {
-        var user = await userManager.FindByEmailAsync(email);
+        var applicationUser = await userManager.FindByEmailAsync(request.Email);
 
-        if (user is null) return null;
+        if (applicationUser is null) return null;
 
-        var result = await signInManager.CheckPasswordSignInAsync(user, password, lockoutOnFailure: false);
+        var result = await signInManager.CheckPasswordSignInAsync(applicationUser, request.Password, lockoutOnFailure: false);
 
-        return result.Succeeded ? user : null;
+        return result.Succeeded ? applicationUser : null;
     }
 
     public async Task SignInUserAsync(ApplicationUser user, bool rememberMe = false) =>
