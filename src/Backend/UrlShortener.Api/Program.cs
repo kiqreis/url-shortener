@@ -48,6 +48,7 @@ builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<AuthenticationHandler>();
 builder.Services.AddScoped<JwtTokenHandler>();
+builder.Services.AddScoped<LoginHandler>();
 builder.Services.AddScoped<RegisterApplicationUserHandler>();
 builder.Services.AddScoped<RegisterUserHandler>();
 builder.Services.AddScoped<RoleAssignmentHandler>();
