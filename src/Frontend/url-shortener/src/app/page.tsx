@@ -75,6 +75,12 @@ interface ShortenedUrl {
 }
 
 
+interface LoginModalProps {
+  isOpen: boolean;
+  darkMode: boolean;
+  onClose: () => void;
+}
+
 class ApiService {
 
   private static async handleResponse<T>(response: Response): Promise<T> {
