@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 
 const ScissorsIcon = () => (
   <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -113,6 +113,16 @@ class ApiService {
 
 }
 
+const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
+  const [isLogin, setIsLogin] = useState(true);
+
+  if (!open) return null;
+
+  const handleModalContentClick = (e: FormEvent) => {
+    e.stopPropagation();
+  }
+}
+
 export default function URLShortener() {
 
   const [url, setUrl] = useState("");
@@ -121,6 +131,7 @@ export default function URLShortener() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingUrls, setIsLoadingUrls] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
 
   useEffect(() => {
