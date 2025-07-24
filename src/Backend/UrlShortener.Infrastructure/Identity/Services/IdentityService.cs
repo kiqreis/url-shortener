@@ -56,8 +56,5 @@ public class IdentityService(
         };
     }
 
-    public Task LogoutAsync()
-    {
-        throw new NotImplementedException();
-    }
+    public async Task LogoutAsync() => await loginHandler.SignOutUserAsync();
 }
