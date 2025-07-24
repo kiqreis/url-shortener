@@ -1,13 +1,13 @@
-using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using UrlShortener.Domain.Common.Security;
+using System.Security.Claims;
+using UrlShortener.Application.Common.Security;
 
 namespace UrlShortener.Infrastructure.Identity.Handlers;
 
 public class JwtTokenHandler(UserManager<ApplicationUser> userManager, IJwtService jwtService, ILogger<JwtTokenHandler> logger)
 {
-    public async Task<string> GenerateJwtTokenAsync(ApplicationUser user, Guid userId)
+    public async Task<JwtTokenResult> GenerateJwtTokenAsync(ApplicationUser user, Guid userId)
     {
         var roles = await userManager.GetRolesAsync(user);
         var claims = new Dictionary<string, string>();
@@ -19,6 +19,6 @@ public class JwtTokenHandler(UserManager<ApplicationUser> userManager, IJwtServi
 
         logger.LogInformation("JWT token generated successfully for user: {UserId}", userId);
         
-        return token.Value;
+        return token;
     }   
 }

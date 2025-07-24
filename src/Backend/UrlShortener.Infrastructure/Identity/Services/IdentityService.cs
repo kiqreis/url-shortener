@@ -29,7 +29,7 @@ public class IdentityService(
         {
             Email = user.Email,
             Plan = user.Plan,
-            Token = token
+            Token = token.Value
         };
     }
 }

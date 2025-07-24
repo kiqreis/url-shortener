@@ -1,4 +1,4 @@
-namespace UrlShortener.Domain.Common.Security;
+namespace UrlShortener.Application.Common.Security;
 
 public class JwtConfig
 {

@@ -12,7 +12,7 @@ using UrlShortener.Application.Common;
 using UrlShortener.Application.Serialization;
 using UrlShortener.Application.UrlShortening.Services;
 using UrlShortener.Application.Users.Services;
-using UrlShortener.Domain.Common.Security;
+using UrlShortener.Application.Common.Security;
 using UrlShortener.Domain.Repositories;
 using UrlShortener.Infrastructure.Cache;
 using UrlShortener.Infrastructure.Data;

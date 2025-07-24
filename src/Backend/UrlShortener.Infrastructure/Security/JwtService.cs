@@ -2,7 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using UrlShortener.Domain.Common.Security;
+using UrlShortener.Application.Common.Security;
 using JwtRegisteredClaimNames = Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames;
 
 namespace UrlShortener.Infrastructure.Security;
@@ -34,7 +34,7 @@ public class JwtService : IJwtService
 
     private SymmetricSecurityKey GetSymmetricSecurityKey() => new(Encoding.UTF8.GetBytes(_jwtConfig.Secret));
 
-    public JwtToken GenerateToken(string subject, Dictionary<string, string>? customClaims = null)
+    public JwtTokenResult GenerateToken(string subject, Dictionary<string, string>? customClaims = null)
     {
         if (string.IsNullOrWhiteSpace(subject))
             throw new ArgumentException("Subject cannot be null or empty", nameof(subject));
@@ -68,7 +68,7 @@ public class JwtService : IJwtService
         var tokenValue = tokenHandler.WriteToken(token);
         var claimsDict = customClaims ?? new Dictionary<string, string>();
 
-        return new JwtToken
+        return new JwtTokenResult
         {
             Value = tokenValue,
             ValidFrom = validFrom,
@@ -132,7 +132,7 @@ public class JwtService : IJwtService
         }
     }
     
-    public JwtToken? RefreshToken(string token, int? newExpiryMinutes = null)
+    public JwtTokenResult? RefreshToken(string token, int? newExpiryMinutes = null)
     {
         if (string.IsNullOrWhiteSpace(token))
             throw new ArgumentException("Token cannot be null or empty", nameof(token));

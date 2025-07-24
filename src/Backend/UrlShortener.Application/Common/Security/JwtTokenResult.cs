@@ -2,7 +2,10 @@
 
 public class JwtTokenResult
 {
-    public string AccessToken { get; set; } = string.Empty;
-    public DateTime ExpiresAt { get; set; }
-    public string RefreshToken { get; set; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
+    public DateTime ValidFrom { get; set; }
+    public DateTime ValidTo { get; set; }
+    public string Subject { get; set; } = string.Empty;
+    public string Issuer { get; set; } = string.Empty;
+    public Dictionary<string, string> Claims { get; set; } = [];
 }
