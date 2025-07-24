@@ -38,6 +38,15 @@ builder.Services.AddSwaggerGen(opt =>
         Title = "Url Shortener",
         Version = "v1"
     });
+
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = @"Jwt Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in text input below. Example: 'Bearer JwtToken'",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.ApiKey,
+        Scheme = "Bearer"
+    });
 });
 
 builder.Services.AddEndpointsApiExplorer();
