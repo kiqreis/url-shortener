@@ -121,7 +121,7 @@ class ApiService {
 const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
   const [isLogin, setIsLogin] = useState(true);
 
-  if (!open) return null;
+  if (!isOpen) return null;
 
   const handleModalContentClick = (e: FormEvent) => {
     e.stopPropagation();
@@ -467,6 +467,12 @@ export default function URLShortener() {
           </div>
         </div>
       </footer>
+
+      <LoginModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        darkMode={darkMode}
+      />
     </div>
   )
 }
