@@ -12,8 +12,10 @@ public class JwtTokenHandler(UserManager<ApplicationUser> userManager, IJwtServi
         var roles = await userManager.GetRolesAsync(user);
         var claims = new Dictionary<string, string>();
 
-        if (roles.Any())
-            claims.Add(ClaimTypes.Role, string.Join(",", roles));
+        foreach (var role in roles)
+        {
+            claims.Add(ClaimTypes.Role, role);
+        }
 
         var token = jwtService.GenerateToken(userId.ToString(), claims);
 
