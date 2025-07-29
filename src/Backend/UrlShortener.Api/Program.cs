@@ -99,9 +99,9 @@ builder.Services.AddSingleton(options => options.GetRequiredService<IOptions<Jwt
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(policy =>
+    options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.AllowAnyOrigin()
+        policy.WithOrigins("http://localhost:518", "http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
@@ -136,7 +136,7 @@ builder.Services.AddAuthentication(options =>
             {
                 context.Token = token;
             }
-            
+
             return Task.CompletedTask;
         }
     };
@@ -178,7 +178,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
