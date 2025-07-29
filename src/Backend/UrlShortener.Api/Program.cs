@@ -76,6 +76,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 builder.Services.AddSingleton<IJsonSerializer, JsonSerializerImpl>();
 builder.Services.AddScoped<IRedisCacheService, RedisCacheService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<CookieAuthService>();
 builder.Services.AddScoped<AuthenticationHandler>();
 builder.Services.AddScoped<JwtTokenHandler>();
 builder.Services.AddScoped<LoginHandler>();
