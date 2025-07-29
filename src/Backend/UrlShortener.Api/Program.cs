@@ -1,9 +1,12 @@
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using StackExchange.Redis;
 using UrlShortener.Api.Common.Api;
@@ -28,6 +31,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 var redisConnection = builder.Configuration.GetConnectionString("Redis");
 var redis = ConnectionMultiplexer.Connect(redisConnection);
+var jwtConfig = builder.Configuration.GetSection("JwtConfig").Get<JwtConfig>() ?? new JwtConfig();
 
 builder.Services.AddOpenApi();
 
@@ -41,7 +45,8 @@ builder.Services.AddSwaggerGen(opt =>
 
     opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-        Description = @"Jwt Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in text input below. Example: 'Bearer JwtToken'",
+        Description =
+            @"Jwt Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in text input below. Example: 'Bearer JwtToken'",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -49,20 +54,20 @@ builder.Services.AddSwaggerGen(opt =>
     });
 
     opt.AddSecurityRequirement(new OpenApiSecurityRequirement
-     {
+    {
         {
-          new OpenApiSecurityScheme
-          {
-            Reference = new OpenApiReference
+            new OpenApiSecurityScheme
             {
-              Type = ReferenceType.SecurityScheme,
-              Id = "Bearer"
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                },
+                In = ParameterLocation.Header
             },
-            In = ParameterLocation.Header
-          },
-          new List<string>()
+            new List<string>()
         }
-     });
+    });
 });
 
 builder.Services.AddEndpointsApiExplorer();
@@ -98,11 +103,44 @@ builder.Services.AddCors(options =>
     {
         policy.AllowAnyOrigin()
             .AllowAnyHeader()
-            .AllowAnyMethod();
+            .AllowAnyMethod()
+            .AllowCredentials();
     });
 });
 
-builder.Services.AddAuthentication();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidIssuer = jwtConfig.Issuer,
+        ValidateAudience = true,
+        ValidAudience = jwtConfig.Audience,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfig.Secret)),
+        ClockSkew = TimeSpan.Zero
+    };
+
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            var token = context.Request.Headers["authToken"];
+
+            if (!string.IsNullOrWhiteSpace(token))
+            {
+                context.Token = token;
+            }
+            
+            return Task.CompletedTask;
+        }
+    };
+});
 
 builder.Services.AddAuthorization();
 
@@ -111,8 +149,14 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
-builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
-    .AddEntityFrameworkStores<AppDbContext>()
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
+    {
+        options.Password.RequireDigit = false;
+        options.Password.RequireLowercase = false;
+        options.Password.RequireUppercase = false;
+        options.Password.RequireNonAlphanumeric = false;
+        options.Password.RequiredLength = 6;
+    }).AddEntityFrameworkStores<AppDbContext>()
     .AddDefaultTokenProviders();
 
 builder.Services.Configure<JsonOptions>(options =>
