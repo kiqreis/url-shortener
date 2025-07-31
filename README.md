@@ -146,7 +146,7 @@ Node.js (versão LTS recomendada).
 
 Subindo com Docker Compose
 
-Clone o repositório:git clone [<URL_DO_REPOSITORIO>](https://github.com/kiqreis/url-shortener)
+Clone o repositório: git clone (https://github.com/kiqreis/url-shortener)
 cd url-shortener
 
 
