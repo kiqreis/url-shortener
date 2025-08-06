@@ -141,12 +141,12 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-zinc-900 bg-opacity-50"
       onClick={onClose}
     >
       <div
         onClick={handleModalContentClick}
-        className={`w-full max-w-sm mx-4 ${darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-900'
+        className={`w-full max-w-sm mx-4 ${darkMode ? 'bg-zinc-900 text-white' : 'bg-white text-zinc-900'
           } border-2 ${darkMode ? 'border-blue-500' : 'border-red-400'
           }`}
         style={{ borderRadius: '12px 2px 12px 2px' }}
@@ -157,7 +157,7 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
               }`}>
               {isLogin ? "Enter" : "Create account"}
             </h2>
-            <p className={`text-sm ${darkMode ? 'text-gray-300' : 'text-gray-600'
+            <p className={`text-sm ${darkMode ? 'text-zinc-300' : 'text-zinc-600'
               }`}>
               {isLogin ? "Access your account" : "Join LinkCute"}
             </p>
@@ -168,7 +168,7 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
               onClick={() => handleTabChange(true)}
               className={`text-sm font-bold mr-6 pb-1 border-b-2 transition-colors ${isLogin
                 ? (darkMode ? 'border-blue-400 text-blue-400' : 'border-red-400 text-red-400')
-                : 'border-transparent text-gray-400'
+                : 'border-transparent text-zinc-400'
                 }`}
             >
               Enter
@@ -177,7 +177,7 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
               onClick={() => handleTabChange(false)}
               className={`text-sm font-bold pb-1 border-b-2 transition-colors ${!isLogin
                 ? (darkMode ? 'border-blue-400 text-blue-400' : 'border-red-400 text-red-400')
-                : 'border-transparent text-gray-400'
+                : 'border-transparent text-zinc-400'
                 }`}
             >
               Register
@@ -193,9 +193,9 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
                   value={formData.name}
                   onChange={handleInputChange}
                   placeholder="Your name"
-                  className={`w-full p-4 border-2 bg-transparent font-medium placeholder-gray-500 focus:outline-none transition-colors ${darkMode
-                    ? 'border-gray-600 focus:border-blue-400 text-white'
-                    : 'border-gray-300 focus:border-red-400 text-gray-900'
+                  className={`w-full p-4 border-2 bg-transparent font-medium placeholder-zinc-500 focus:outline-none transition-colors ${darkMode
+                    ? 'border-zinc-600 focus:border-blue-400 text-white'
+                    : 'border-zinc-300 focus:border-red-400 text-zinc-900'
                     }`}
                   style={{ borderRadius: '8px 2px 8px 2px' }}
                 />
@@ -209,9 +209,9 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
                 value={formData.email}
                 onChange={handleInputChange}
                 placeholder="email@example.com"
-                className={`w-full p-4 border-2 bg-transparent font-medium placeholder-gray-500 focus:outline-none transition-colors ${darkMode
-                  ? 'border-gray-600 focus:border-blue-400 text-white'
-                  : 'border-gray-300 focus:border-red-400 text-gray-900'
+                className={`w-full p-4 border-2 bg-transparent font-medium placeholder-zinc-500 focus:outline-none transition-colors ${darkMode
+                  ? 'border-zinc-600 focus:border-blue-400 text-white'
+                  : 'border-zinc-300 focus:border-red-400 text-zinc-900'
                   }`}
                 style={{ borderRadius: '2px 8px 2px 8px' }}
               />
@@ -225,8 +225,8 @@ const LoginModal = ({ isOpen, darkMode, onClose }: LoginModalProps) => {
                 onChange={handleInputChange}
                 placeholder="••••••••"
                 className={`w-full p-4 border-2 bg-transparent font-medium placeholder-gray-500 focus:outline-none transition-colors ${darkMode
-                  ? 'border-gray-600 focus:border-blue-400 text-white'
-                  : 'border-gray-300 focus:border-red-400 text-gray-900'
+                  ? 'border-zinc-600 focus:border-blue-400 text-white'
+                  : 'border-zinc-300 focus:border-red-400 text-zinc-900'
                   }`}
                 style={{ borderRadius: '8px 2px 8px 2px' }}
               />
