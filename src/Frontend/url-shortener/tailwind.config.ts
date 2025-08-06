@@ -15,6 +15,10 @@ const config: Config = {
                     "2xl": "1400px",
                 },
             },
+            fontFamily: {
+                sans: ['var(--font-nunito)', 'Helvetica', 'sans-serif'],
+                mono: ['var(--font-source-code-pro)', 'monospace'],
+            },
         },
     },
     plugins: [],

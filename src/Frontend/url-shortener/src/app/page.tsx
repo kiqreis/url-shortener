@@ -3,16 +3,12 @@
 import { ChangeEventHandler, FormEvent, useEffect, useState } from "react"
 
 import {
-  Link,
   Copy,
   Check,
   ExternalLink,
   Sun,
   Moon,
   User,
-  Zap,
-  Shield,
-  TrendingUp,
   ArrowRight
 } from "lucide-react"
 
@@ -328,20 +324,20 @@ export default function URLShortener() {
   }
 
   return (
-    <div className={`min-h-screen transition-colors ${darkMode ? 'bg-gray-900' : 'bg-gray-50'
+    <div className={`min-h-screen flex flex-col transition-colors ${darkMode ? 'bg-zinc-900' : 'bg-zinc-50'
       }`}>
-      <nav className={`px-6 py-4 border-b-2 ${darkMode ? 'border-gray-700' : 'border-gray-200'
+      <nav className={`px-6 py-4 border-b-1 ${darkMode ? 'border-zinc-700' : 'border-zinc-200'
         }`}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center">
-            <div className={`w-8 h-8 mr-3 flex items-center justify-center font-black text-xl ${darkMode ? 'text-blue-400' : 'text-red-400'
+            <div className={`w-8 h-8 flex items-center justify-center font-black text-xl ${darkMode ? 'text-blue-400' : 'text-red-400'
               }`}>
-              L
+              Z
             </div>
-            <div>
-              <h1 className={`text-xl font-black ${darkMode ? 'text-white' : 'text-gray-900'
+            <div className="-ml-2">
+              <h1 className={`text-xl font-black ${darkMode ? 'text-white' : 'text-zinc-900'
                 }`}>
-                LinkCute
+                url
               </h1>
             </div>
           </div>
@@ -351,7 +347,7 @@ export default function URLShortener() {
               onClick={() => setIsModalOpen(true)}
               className={`p-2 transition-colors ${darkMode
                 ? 'text-gray-300 hover:text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-zinc-600 hover:text-zinc-900'
                 }`}
             >
               <User size={18} />
@@ -361,7 +357,7 @@ export default function URLShortener() {
               onClick={toggleDarkMode}
               className={`p-2 transition-colors ${darkMode
                 ? 'text-yellow-400 hover:text-yellow-300'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-zinc-600 hover:text-zinc-900'
                 }`}
             >
               {darkMode ? <Sun size={18} /> : <Moon size={18} />}
@@ -370,13 +366,12 @@ export default function URLShortener() {
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-6">
+      <main className="flex-1 max-w-4xl mx-auto px-6 w-full">
         <div className="pt-16 pb-12">
           <div className="max-w-2xl">
-            <h2 className={`text-5xl font-black mb-6 leading-tight ${darkMode ? 'text-white' : 'text-gray-900'
+            <h2 className={`text-4xl font-medium mb-6 leading-tight ${darkMode ? 'text-white' : 'text-zinc-900'
               }`}>
-              Short your URLs
-              <br />
+              Short your URLs&nbsp;
               <span className={`${darkMode ? 'text-blue-400' : 'text-red-400'
                 }`}>
                 in seconds
@@ -392,8 +387,8 @@ export default function URLShortener() {
                 value={url}
                 onChange={(e) => setUrl(e.target.value)}
                 className={`flex-1 p-4 text-lg border-2 bg-transparent font-medium placeholder-gray-500 focus:outline-none transition-all ${darkMode
-                  ? 'border-gray-600 focus:border-blue-400 text-white'
-                  : 'border-gray-300 focus:border-red-400 text-gray-900'
+                  ? 'border-zinc-600 focus:border-blue-400 text-white'
+                  : 'border-zinc-300 focus:border-red-400 text-zinc-900'
                   }`}
                 style={{ borderRadius: '8px 2px 8px 2px' }}
               />
@@ -416,8 +411,8 @@ export default function URLShortener() {
         </div>
 
         {shortenedUrls.length > 0 && (
-          <div className="mb-20">
-            <h3 className={`text-2xl font-black mb-8 ${darkMode ? 'text-white' : 'text-gray-900'
+          <div className="mb-8">
+            <h3 className={`text-2xl font-medium mb-8 ${darkMode ? 'text-white' : 'text-zinc-900'
               }`}>
               Your links
             </h3>
@@ -426,7 +421,7 @@ export default function URLShortener() {
                 <div
                   key={item.shortCode}
                   className={`p-6 border-l-4 transition-colors ${darkMode
-                    ? 'bg-gray-800 border-blue-400'
+                    ? 'bg-zinc-800 border-blue-400'
                     : 'bg-white border-red-400'
                     }`}
                   style={{
@@ -437,19 +432,19 @@ export default function URLShortener() {
                     <div className="flex-1 min-w-0 mr-4">
                       <div className="flex items-center mb-2">
                         <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-                        <span className="text-xs font-bold text-green-600 uppercase tracking-wide">
+                        <span className={`text-xs font-bold uppercase tracking-wide ${darkMode ? 'text-green-500' : 'text-green-600'}`}>
                           Active
                         </span>
-                        <span className={`text-xs ml-2 ${darkMode ? 'text-gray-400' : 'text-gray-500'
+                        <span className={`text-xs ml-2 ${darkMode ? 'text-zinc-400' : 'text-zinc-500'
                           }`}>
                           {item.remainingShortenings} remainings
                         </span>
                       </div>
-                      <p className={`text-xl font-black mb-1 ${darkMode ? 'text-blue-300' : 'text-red-400'
+                      <p className={`text-xl font-bold mb-1 ${darkMode ? 'text-blue-300' : 'text-red-400'
                         }`}>
                         {item.shortUrl}
                       </p>
-                      <p className={`text-sm truncate ${darkMode ? 'text-gray-400' : 'text-gray-600'
+                      <p className={`text-sm truncate ${darkMode ? 'text-zinc-400' : 'text-zinc-600'
                         }`}>
                         {item.originalUrl}
                       </p>
@@ -459,7 +454,7 @@ export default function URLShortener() {
                         onClick={() => copyToClipboard(item.shortUrl, item.shortCode)}
                         className={`p-3 font-black transition-all transform hover:scale-110 ${copiedId === item.shortCode
                           ? 'bg-green-500 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-green-500 hover:text-white'
+                          : 'bg-zinc-200 text-zinc-700 hover:bg-green-500 hover:text-white'
                           }`}
                         style={{ borderRadius: '6px 2px 6px 2px' }}
                       >
@@ -471,7 +466,7 @@ export default function URLShortener() {
                       </button>
                       <button
                         onClick={() => window.open(item.originalUrl, "_blank")}
-                        className="p-3 bg-gray-200 text-gray-700 hover:bg-gray-700 hover:text-white transition-all transform hover:scale-110"
+                        className="p-3 bg-zinc-200 text-zinc-700 hover:bg-zinc-700 hover:text-white transition-all transform hover:scale-110"
                         style={{ borderRadius: '2px 6px 2px 6px' }}
                       >
                         <ExternalLink size={16} />
@@ -483,61 +478,14 @@ export default function URLShortener() {
             </div>
           </div>
         )}
-
-        <div className="py-16 border-t-2 border-dashed border-gray-300">
-          <div className="grid md:grid-cols-3 gap-8">
-            <div>
-              <div className={`w-12 h-12 mb-4 flex items-center justify-center font-black text-2xl ${darkMode ? 'text-yellow-400' : 'text-orange-500'
-                }`}>
-                ⚡
-              </div>
-              <h4 className={`text-lg font-black mb-2 ${darkMode ? 'text-white' : 'text-gray-900'
-                }`}>
-                Quick and easy
-              </h4>
-              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`}>
-                Paste, click, done. No fuss.
-              </p>
-            </div>
-            <div>
-              <div className={`w-12 h-12 mb-4 flex items-center justify-center font-black text-2xl ${darkMode ? 'text-green-400' : 'text-green-600'
-                }`}>
-                🛡️
-              </div>
-              <h4 className={`text-lg font-black mb-2 ${darkMode ? 'text-white' : 'text-gray-900'
-                }`}>
-                Reliable
-              </h4>
-              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`}>
-                Your links are always safe and functional.
-              </p>
-            </div>
-            <div>
-              <div className={`w-12 h-12 mb-4 flex items-center justify-center font-black text-2xl ${darkMode ? 'text-blue-400' : 'text-blue-600'
-                }`}>
-                📊
-              </div>
-              <h4 className={`text-lg font-black mb-2 ${darkMode ? 'text-white' : 'text-gray-900'
-                }`}>
-                Track your urls
-              </h4>
-              <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'
-                }`}>
-                Manage how many clicks your URLs received.
-              </p>
-            </div>
-          </div>
-        </div>
       </main>
 
-      <footer className={`mt-16 py-8 border-t-2 border-dashed ${darkMode ? 'border-gray-700' : 'border-gray-300'
+      <footer className={`mt-auto py-8 border-t-2 border-dashed ${darkMode ? 'border-zinc-700' : 'border-zinc-300'
         }`}>
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <p className={`text-sm font-medium ${darkMode ? 'text-gray-400' : 'text-gray-600'
+          <p className={`text-sm font-medium ${darkMode ? 'text-zinc-400' : 'text-zinc-600'
             }`}>
-            LinkCute © 2025
+            Zurl © 2025
           </p>
         </div>
       </footer>
