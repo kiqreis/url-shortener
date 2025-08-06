@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using UrlShortener.Api.Common.Api;
+using UrlShortener.Api.Common.Extensions;
 using UrlShortener.Application.Users.DTOs.Requests;
 using UrlShortener.Application.Users.Services;
 
@@ -14,9 +15,11 @@ public class RegisterUser : IEndpoint
         .WithOpenApi();
 
     private static async Task<IResult> HandleAsync([FromBody] CreateUserRequest request,
-        [FromServices] IIdentityService handler)
+        [FromServices] IIdentityService handler, HttpContext httpContext)
     {
         var result = await handler.RegisterAsync(request);
+
+        httpContext.SetAuthToken(result.Token);
 
         return Results.Created($"{result.Email}", result);
     }

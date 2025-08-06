@@ -11,13 +11,14 @@ public class LoginHandler(UserManager<ApplicationUser> userManager, SignInManage
 
         if (applicationUser is null) return null;
 
-        var result = await signInManager.CheckPasswordSignInAsync(applicationUser, request.Password, lockoutOnFailure: false);
+        var result =
+            await signInManager.CheckPasswordSignInAsync(applicationUser, request.Password, lockoutOnFailure: false);
 
         return result.Succeeded ? applicationUser : null;
     }
 
     public async Task SignInUserAsync(ApplicationUser user, bool rememberMe = false) =>
         await signInManager.SignInAsync(user, isPersistent: rememberMe);
-    
+
     public async Task SignOutUserAsync() => await signInManager.SignOutAsync();
 }

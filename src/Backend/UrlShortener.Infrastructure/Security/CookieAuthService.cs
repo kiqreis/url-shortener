@@ -8,10 +8,10 @@ public class CookieAuthService(IConfiguration configuration)
     private CookieOptions GetAuthCookieOptions() => new()
     {
         HttpOnly = true,
-        Secure = true,
+        Secure = false,
         Path = "/",
         SameSite = SameSiteMode.Strict,
-        Expires = DateTimeOffset.UtcNow.AddMinutes(configuration.GetValue<int>("ExpiryInMinutes"))
+        Expires = DateTimeOffset.UtcNow.AddMinutes(configuration.GetValue<int>("JwtConfig:ExpiryInMinutes"))
     };
 
     public void SetAuthCookie(HttpContext httpContext, string token)

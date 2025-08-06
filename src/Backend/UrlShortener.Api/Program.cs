@@ -46,7 +46,7 @@ builder.Services.AddSwaggerGen(opt =>
     opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description =
-            @"Jwt Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in text input below. Example: 'Bearer JwtToken'",
+            "Jwt Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in text input below. Example: 'Bearer JwtToken'",
         Name = "Authorization",
         In = ParameterLocation.Header,
         Type = SecuritySchemeType.ApiKey,
@@ -102,7 +102,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", policy =>
     {
-        policy.WithOrigins("http://localhost:518", "http://localhost:3000")
+        policy.WithOrigins("http://localhost:5181", "http://localhost:3000")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
