@@ -3,12 +3,15 @@ using Microsoft.Extensions.Configuration;
 
 namespace UrlShortener.Infrastructure.Security;
 
-public class CookieAuthService(IConfiguration configuration)
+public class CookieAuthService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
 {
+    private readonly bool _isDevelopment =
+        Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
+
     private CookieOptions GetAuthCookieOptions() => new()
     {
         HttpOnly = true,
-        Secure = false,
+        Secure = !_isDevelopment,
         Path = "/",
         SameSite = SameSiteMode.Strict,
         Expires = DateTimeOffset.UtcNow.AddMinutes(configuration.GetValue<int>("JwtConfig:ExpiryInMinutes"))
@@ -27,4 +30,6 @@ public class CookieAuthService(IConfiguration configuration)
             Secure = true
         });
     }
+    
+    public string? GetAuthToken(HttpContext httpContext) => httpContext.Request.Cookies["authToken"];
 }
