@@ -60,5 +60,9 @@ public class IdentityService(
         };
     }
 
-    public async Task LogoutAsync() => await loginHandler.SignOutUserAsync();
+    public async Task LogoutAsync()
+    {
+        await loginHandler.SignOutUserAsync();
+        cookieAuthService.RemoveAuthCookie();
+    }
 }
