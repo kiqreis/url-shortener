@@ -337,7 +337,7 @@ export default function URLShortener() {
             <div className="-ml-2">
               <h1 className={`text-xl font-black ${darkMode ? 'text-white' : 'text-zinc-900'
                 }`}>
-                url
+                ipply
               </h1>
             </div>
           </div>
@@ -485,7 +485,7 @@ export default function URLShortener() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <p className={`text-sm font-medium ${darkMode ? 'text-zinc-400' : 'text-zinc-600'
             }`}>
-            Zurl © 2025
+            Zipply © 2025
           </p>
         </div>
       </footer>

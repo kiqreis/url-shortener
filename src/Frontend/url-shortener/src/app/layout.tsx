@@ -15,7 +15,7 @@ const sourceCodePro = Source_Code_Pro({
 });
 
 export const metadata: Metadata = {
-  title: "Zurl",
+  title: "Zipply",
   description: "Shorten your URLs",
 };
 

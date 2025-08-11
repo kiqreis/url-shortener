@@ -17,19 +17,20 @@ public class CookieAuthService(IConfiguration configuration, IHttpContextAccesso
         Expires = DateTimeOffset.UtcNow.AddMinutes(configuration.GetValue<int>("JwtConfig:ExpiryInMinutes"))
     };
 
-    public void SetAuthCookie(HttpContext httpContext, string token)
+    public void SetAuthCookie(string token)
     {
-        httpContext.Response.Cookies.Append("authToken", token, GetAuthCookieOptions());
+        httpContextAccessor.HttpContext.Response.Cookies.Append("authToken", token, GetAuthCookieOptions());
     }
 
-    public void RemoveAuthCookie(HttpContext httpContext)
+    public void RemoveAuthCookie()
     {
-        httpContext.Response.Cookies.Delete("authToken", new CookieOptions
+        httpContextAccessor.HttpContext.Response.Cookies.Delete("authToken", new CookieOptions
         {
             Path = "/",
-            Secure = true
+            Secure = !_isDevelopment,
+            SameSite = _isDevelopment ? SameSiteMode.Lax : SameSiteMode.Strict
         });
     }
-    
-    public string? GetAuthToken(HttpContext httpContext) => httpContext.Request.Cookies["authToken"];
+
+    public string? GetAuthToken() => httpContextAccessor.HttpContext.Request.Cookies["authToken"];
 }

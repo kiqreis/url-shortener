@@ -8,13 +8,13 @@ public static class HttpContextExtensions
     {
         var cookieService = httpContext.RequestServices.GetRequiredService<CookieAuthService>();
 
-        cookieService.SetAuthCookie(httpContext, token);
+        cookieService.SetAuthCookie(token);
     }
 
     public static void ClearAuthToken(this HttpContext httpContext)
     {
         var cookieService = httpContext.RequestServices.GetRequiredService<CookieAuthService>();
 
-        cookieService.RemoveAuthCookie(httpContext);
+        cookieService.RemoveAuthCookie();
     }
 }

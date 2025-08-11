@@ -2,23 +2,25 @@
 using UrlShortener.Application.Users.DTOs.Responses;
 using UrlShortener.Application.Users.Services;
 using UrlShortener.Infrastructure.Identity.Handlers;
+using UrlShortener.Infrastructure.Security;
 
 namespace UrlShortener.Infrastructure.Identity.Services;
 
 public class IdentityService(
-    RegisterApplicationUserHandler  registerApplicationUserHandler,
-    RoleAssignmentHandler  roleAssignmentHandler,
-    RegisterUserHandler  registerUserHandler,
-    AuthenticationHandler  authenticationHandler,
-    JwtTokenHandler  jwtTokenHandler,
+    RegisterApplicationUserHandler registerApplicationUserHandler,
+    RoleAssignmentHandler roleAssignmentHandler,
+    RegisterUserHandler registerUserHandler,
+    AuthenticationHandler authenticationHandler,
+    JwtTokenHandler jwtTokenHandler,
     LoginHandler loginHandler,
-    IUserService userService)
+    IUserService userService,
+    CookieAuthService cookieAuthService)
     : IIdentityService
 {
     public async Task<CreateUserResponse> RegisterAsync(CreateUserRequest request)
     {
         var applicationUser = await registerApplicationUserHandler.CreateUserAsync(request);
-        
+
         await roleAssignmentHandler.AssignDefaultRoleAsync(applicationUser);
 
         var user = await registerUserHandler.CreateUserAsync(applicationUser, request);
@@ -47,6 +49,8 @@ public class IdentityService(
 
         var jwtToken = await jwtTokenHandler.GenerateJwtTokenAsync(applicationUser, applicationUser.Id);
 
+        cookieAuthService.SetAuthCookie(jwtToken.Value);
+        
         return new LoginResponse
         {
             Email = user.Email,
