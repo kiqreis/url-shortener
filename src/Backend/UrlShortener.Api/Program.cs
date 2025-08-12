@@ -183,6 +183,8 @@ app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<CookieAuthenticationMiddleware>();
+
 app.MapEndpoints();
 
 app.Run();
