@@ -79,7 +79,7 @@ public class JwtService : IJwtService
         };
     }
 
-    private JwtTokenValidation ValidateToken(string token)
+    public JwtTokenValidation ValidateToken(string token)
     {
         try
         {
