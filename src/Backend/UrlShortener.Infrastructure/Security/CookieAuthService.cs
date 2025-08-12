@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 
 namespace UrlShortener.Infrastructure.Security;
 
-public class CookieAuthService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+public class CookieAuthService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor, JwtService jwtService)
 {
     private readonly bool _isDevelopment =
         Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development";
@@ -19,6 +20,11 @@ public class CookieAuthService(IConfiguration configuration, IHttpContextAccesso
 
     public void SetAuthCookie(string token)
     {
+        var validation = jwtService.ValidateToken(token);
+
+        if (!validation.IsValid)
+            throw new SecurityTokenException("Invalid Jwt token");
+
         httpContextAccessor.HttpContext.Response.Cookies.Append("authToken", token, GetAuthCookieOptions());
     }
 
